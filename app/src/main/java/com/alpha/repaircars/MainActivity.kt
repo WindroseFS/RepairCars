@@ -1,5 +1,6 @@
 package com.alpha.repaircars
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         binding.buttonEntrar.setOnClickListener {
             val usuario = binding.edTextUsuario.text.toString().trim()
             val senha = binding.edTextSenha.text.toString().trim()
@@ -30,9 +32,14 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(applicationContext, "Digite o usuário e/ou a senha.", Toast.LENGTH_SHORT).show()
             }else if(usuario.equals("Almir") && senha.equals("pass")) {
                 Toast.makeText(applicationContext, "Obrigado por testar, $usuario.", Toast.LENGTH_LONG).show()
+                val i = Intent(this, ProfileActivity::class.java)
+                startActivity(i)
             }else{
                 Toast.makeText(applicationContext, "Usuário e/ou senha inválidos.", Toast.LENGTH_SHORT).show()
             }
+
+            binding.edTextUsuario.setText("")
+            binding.edTextSenha.setText("")
         }
     }
 }
