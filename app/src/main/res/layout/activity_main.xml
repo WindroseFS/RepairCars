@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:src="@drawable/repaircarssiteoficial"
+        android:scaleType="fitXY"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textUsuario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="Usuário:"
+            android:layout_marginBottom="50dp"
+            android:paddingTop="50dp"/>
+
+        <EditText
+            android:id="@+id/edTextUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_margin="15dp"
+            android:hint="Digite o usuário" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textSenha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="Senha:  "
+            android:layout_marginBottom="50dp"/>
+
+        <EditText
+            android:id="@+id/edTextSenha"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_margin="15dp"
+            android:hint="Digite a senha"
+            android:inputType="textPassword"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonEntrar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Entrar"
+        android:textColor="@color/white"
+        android:backgroundTint="#00a2eb"
+        android:layout_margin="15dp"/>
+
+    <Button
+        android:id="@+id/buttonCriar_conta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Criar conta"
+        android:textColor="@color/white"
+        android:backgroundTint="#00a2eb"
+        android:layout_margin="15dp"/>
+
+    <TextView
+        android:id="@+id/text_copyright"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:layout_margin="10dp"
+        android:padding="10dp"
+        android:text="2024, Thor Aplicativos"/>
+</LinearLayout>
