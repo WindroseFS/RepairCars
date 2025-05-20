@@ -1,11 +1,11 @@
-package com.alpha.repaircars
+package com.thorapps.repaircars
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.alpha.repaircars.databinding.ActivityLoginFailBinding
+import com.thorapps.repaircars.databinding.ActivityLoginFailBinding
 
 class LoginFailActivity : AppCompatActivity() {
 

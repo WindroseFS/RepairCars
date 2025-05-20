@@ -7,36 +7,40 @@
     android:orientation="vertical"
     tools:context=".ProfileActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:title="Perfil"
-        android:titleTextColor="@android:color/white"
-        android:background="#00BFFF"
-        android:layout_marginBottom="800px" />
+    <!-- AppBar (Toolbar incluída) -->
+    <include
+        android:id="@+id/appbarLayout"
+        layout="@layout/appbar" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
 
         <TextView
+            android:id="@+id/textMensagem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/nenhuma_mensagem_por_enquanto"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:layout_centerInParent="true" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonSair"
+            style="@style/Widget.MaterialComponents.Button.Icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sair"
-            android:backgroundTint="#00BFFF"
-            android:textColor="@android:color/white"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_margin="15dp" />
-
+            android:layout_margin="16dp"
+            app:icon="@drawable/add_icon"
+            app:iconTint="@android:color/white"
+            app:backgroundTint="#00BFFF"
+            android:contentDescription="@string/add"
+            android:text=""
+            android:minHeight="48dp"
+            android:minWidth="48dp" />
     </RelativeLayout>
 
 </LinearLayout>
