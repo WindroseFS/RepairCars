@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -7,7 +6,6 @@
     android:orientation="vertical"
     tools:context=".ProfileActivity">
 
-    <!-- AppBar (Toolbar incluída) -->
     <include
         android:id="@+id/appbarLayout"
         layout="@layout/appbar" />
@@ -18,22 +16,21 @@
         android:layout_weight="1"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/textMensagem"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerRecentMessages"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/nenhuma_mensagem_por_enquanto"
-            android:textAlignment="center"
-            android:layout_centerInParent="true" />
+            android:layout_height="0dp"
+            android:padding="16dp"
+            android:clipToPadding="false"/>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonSair"
+            android:id="@+id/buttonChat"
             style="@style/Widget.MaterialComponents.Button.Icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="16dp"
+            android:layout_above="@id/buttonSair"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="24dp"
             app:icon="@drawable/add_icon"
             app:iconTint="@android:color/white"
             app:backgroundTint="#00BFFF"
@@ -41,6 +38,21 @@
             android:text=""
             android:minHeight="48dp"
             android:minWidth="48dp" />
-    </RelativeLayout>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonSair"
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="32dp"
+            app:icon="@drawable/sign_out_icon"
+            app:iconTint="@android:color/white"
+            app:backgroundTint="#00BFFF"
+            android:contentDescription="@string/add"
+            android:text=""
+            android:minHeight="48dp"
+            android:minWidth="48dp" />
+    </RelativeLayout>
 </LinearLayout>
