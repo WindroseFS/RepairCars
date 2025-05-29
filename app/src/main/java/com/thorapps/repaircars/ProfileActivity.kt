@@ -34,6 +34,11 @@ class ProfileActivity : AppCompatActivity() {
             insets
         }
 
+        /// Abre a tela de chat
+        binding.buttonChat.setOnClickListener {
+            startActivity(Intent(this, ChatActivity::class.java))
+        }
+
         // Ação do botão "Sair"
         binding.buttonSair.setOnClickListener {
             Toast.makeText(this, "Saindo do perfil...", Toast.LENGTH_SHORT).show()
