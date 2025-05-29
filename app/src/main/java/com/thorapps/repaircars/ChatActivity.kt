@@ -1,34 +1,21 @@
 package com.thorapps.repaircars
-
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 
-class ChatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat)
-
-        val composeView = findViewById<ComposeView>(R.id.compose_view)
-        composeView.setContent {
             MaterialTheme {
                 ChatScreen()
             }
         }
     }
 }
-
-data class Message(
-    val sender: String,
-    val content: String
-)
 
 @Composable
 fun ChatScreen() {
