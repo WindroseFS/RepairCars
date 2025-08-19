@@ -1,78 +1,95 @@
 package com.thorapps.repaircars
+
 import android.os.Bundle
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.thorapps.repaircars.databinding.ActivityChatBinding
+
+class ChatActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityChatBinding
+    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var messagesAdapter: MessagesAdapter
+    private var contactId: Long = -1
+    private var contactName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-            MaterialTheme {
-                ChatScreen()
+        binding = ActivityChatBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        // Criar canal de notificações (garante que exista)
+        NotificationHelper.createChannel(this)
+
+        // Inicialização segura com verificação de intent
+        contactId = intent.getLongExtra("CONTACT_ID", -1).takeIf { it != -1L }
+            ?: run {
+                finish() // Encerra se não houver ID válido
+                return
+            }
+
+        contactName = intent.getStringExtra("CONTACT_NAME") ?: "Contato Desconhecido"
+
+        dbHelper = DatabaseHelper(this)
+
+        setupActionBar()
+        setupRecyclerView()
+        setupSendButton()
+    }
+
+    private fun setupActionBar() {
+        supportActionBar?.apply {
+            title = contactName
+            setDisplayHomeAsUpEnabled(true)
+        }
+    }
+
+    private fun setupRecyclerView() {
+        messagesAdapter = MessagesAdapter(dbHelper.getMessagesForContact(contactId))
+        binding.messagesRecyclerView.apply {
+            layoutManager = LinearLayoutManager(this@ChatActivity).apply {
+                stackFromEnd = true // Melhora a rolagem automática
+            }
+            adapter = messagesAdapter
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun setupSendButton() {
+        binding.btnSend.setOnClickListener {
+            val message = binding.etMessage.text.toString().trim()
+            if (message.isNotEmpty()) {
+                // Adiciona a mensagem no banco
+                dbHelper.addMessage(contactId, message, true)
+
+                // Limpa o campo de texto
+                binding.etMessage.text.clear()
+
+                // Atualiza RecyclerView
+                refreshMessages()
+
+                // Exibe a notificação interativa
+                NotificationHelper.showMessageNotification(this, contactId, contactName)
             }
         }
     }
-}
 
-@Composable
-fun ChatScreen() {
-    var messageText by remember { mutableStateOf("") }
-    val messages = remember { mutableStateListOf<Message>() }
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
-
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(messages) { message ->
-                ChatBubble(message)
-            }
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            TextField(
-                value = messageText,
-                onValueChange = { messageText = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Digite sua mensagem") }
-            )
-            Button(onClick = {
-                if (messageText.isNotBlank()) {
-                    messages.add(Message("Você", messageText))
-                    messages.add(Message("Bot", "Você disse: $messageText"))
-                    messageText = ""
-                }
-            }) {
-                Text("Enviar")
-            }
-        }
+    override fun onResume() {
+        super.onResume()
+        refreshMessages()
     }
-}
 
-@Composable
-fun ChatBubble(message: Message) {
-    Column {
-        Text(text = "${message.sender}:", style = MaterialTheme.typography.labelSmall)
-        Surface(
-            tonalElevation = 2.dp,
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = message.content,
-                modifier = Modifier.padding(12.dp)
-            )
-        }
+    private fun refreshMessages() {
+        val messages = dbHelper.getMessagesForContact(contactId)
+        messagesAdapter.updateMessages(messages)
+
+        // Rolagem suave para o final
+        binding.messagesRecyclerView.postDelayed({
+            binding.messagesRecyclerView.smoothScrollToPosition(messagesAdapter.itemCount - 1)
+        }, 100)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 }

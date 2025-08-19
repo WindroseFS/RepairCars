@@ -2,53 +2,53 @@ package com.thorapps.repaircars
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.thorapps.repaircars.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMainBinding
-
-    // Defina o login e senha válidos (pode vir de banco ou API em apps reais)
-    private val usuarioValido = "Almir"
-    private val senhaValida = "pass"
+    private lateinit var dbHelper: DatabaseHelper
+    private lateinit var contactsAdapter: ContactsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        dbHelper = DatabaseHelper(this)
+
+        // Configuração dos botões
+        binding.btnChat.setOnClickListener {
+            startActivity(Intent(this, ChatActivity::class.java))
         }
 
-        binding.buttonEntrar.setOnClickListener {
-            val usuario = binding.edTextUsuario.text.toString().trim()
-            val senha = binding.edTextSenha.text.toString().trim()
+        binding.btnLogout.setOnClickListener {
+            finish() // Volta para LoginActivity
+        }
 
-            if (usuario.isEmpty() || senha.isEmpty()) {
-                Toast.makeText(applicationContext, "Digite o usuário e/ou a senha.", Toast.LENGTH_SHORT).show()
-            } else if (usuario == usuarioValido && senha == senhaValida) {
-                Toast.makeText(applicationContext, "Obrigado por testar, $usuario.", Toast.LENGTH_LONG).show()
-                val i = Intent(this, LoginOkActivity::class.java)
-                i.putExtra("Almir", usuario)
-                i.putExtra("pass", senha)
-                startActivity(i)
-            } else {
-                Toast.makeText(applicationContext, "Usuário e/ou senha inválidos.", Toast.LENGTH_SHORT).show()
-                val j = Intent(this, LoginFailActivity::class.java)
-                startActivity(j)
+        binding.btnViewDatabase.setOnClickListener {
+            startActivity(Intent(this, DatabaseViewerActivity::class.java))
+        }
+
+        // Configuração do RecyclerView para contatos
+        contactsAdapter = ContactsAdapter(dbHelper.getAllContacts()) { contact ->
+            val intent = Intent(this, ChatActivity::class.java).apply {
+                putExtra("CONTACT_ID", contact.id)
+                putExtra("CONTACT_NAME", contact.name)
             }
-
-            binding.edTextUsuario.setText("")
-            binding.edTextSenha.setText("")
+            startActivity(intent)
         }
+
+        binding.contactsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = contactsAdapter
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Atualiza a lista quando a activity retornar
+        contactsAdapter.updateContacts(dbHelper.getAllContacts())
     }
 }
