@@ -6,10 +6,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.content.pm.PackageManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import androidx.core.app.RemoteInput
+import androidx.core.content.ContextCompat
 
 object NotificationHelper {
     private const val CHANNEL_ID = "chat_channel"
@@ -33,15 +35,13 @@ object NotificationHelper {
         val user = Person.Builder().setName("Você").build()
         val contact = Person.Builder().setName(contactName).build()
 
-        val style = NotificationCompat.MessagingStyle(user).apply {
-            isGroupConversation = true
-            conversationTitle = contactName
+        val style = NotificationCompat.MessagingStyle(user).also { style ->
+            style.setConversationTitle(contactName)
             messages.forEach {
-                addMessage(it.text, System.currentTimeMillis(), if (it.isSent) user else contact)
+                style.addMessage(it.text, System.currentTimeMillis(), if (it.isSent) user else contact)
             }
         }
 
-        // Intent para abrir ChatActivity
         val openChatIntent = Intent(context, ChatActivity::class.java).apply {
             putExtra("CONTACT_ID", contactId)
             putExtra("CONTACT_NAME", contactName)
@@ -51,7 +51,6 @@ object NotificationHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Resposta rápida
         val remoteInput = RemoteInput.Builder("key_text_reply")
             .setLabel("Digite sua resposta...")
             .build()
@@ -70,7 +69,7 @@ object NotificationHelper {
         ).addRemoteInput(remoteInput).build()
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_message) // coloque um ícone no drawable
+            .setSmallIcon(android.R.drawable.ic_dialog_email)
             .setContentTitle(contactName)
             .setContentText(messages.lastOrNull()?.text ?: "")
             .setStyle(style)
@@ -79,6 +78,18 @@ object NotificationHelper {
             .addAction(replyAction)
             .build()
 
-        NotificationManagerCompat.from(context).notify(contactId.toInt(), notification)
+        // Checagem de permissão no Android 13+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            try {
+                NotificationManagerCompat.from(context).notify(contactId.toInt(), notification)
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+            }
+        }
     }
 }
