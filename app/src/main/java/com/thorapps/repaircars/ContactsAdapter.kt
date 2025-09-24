@@ -7,36 +7,31 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class ContactsAdapter(
-    private var contacts: List<DatabaseHelper.Contact>,
-    private val onItemClick: (DatabaseHelper.Contact) -> Unit
-) : RecyclerView.Adapter<ContactsAdapter.ViewHolder>() {
+    private var contacts: List<ContactDisplay>,
+    private val onItemClick: (ContactDisplay) -> Unit
+) : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val nameTextView: TextView = view.findViewById(R.id.contactName)
-        val messageTextView: TextView = view.findViewById(R.id.lastMessage)
-        val timeTextView: TextView = view.findViewById(R.id.messageTime)
+    class ContactViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvContactName: TextView = view.findViewById(R.id.tvContactName)
+        val tvLastMessage: TextView = view.findViewById(R.id.tvLastMessage)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_contact, parent, false)
-        return ViewHolder(view)
+        return ContactViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun getItemCount(): Int = contacts.size
+
+    override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = contacts[position]
-        holder.nameTextView.text = contact.name
-        holder.messageTextView.text = contact.lastMessage ?: ""
-        holder.timeTextView.text = contact.timestamp
-
-        holder.itemView.setOnClickListener {
-            onItemClick(contact)
-        }
+        holder.tvContactName.text = contact.name
+        holder.tvLastMessage.text = "Última mensagem: ${contact.lastMessage}"
+        holder.itemView.setOnClickListener { onItemClick(contact) }
     }
 
-    override fun getItemCount() = contacts.size
-
-    fun updateContacts(newContacts: List<DatabaseHelper.Contact>) {
+    fun updateContacts(newContacts: List<ContactDisplay>) {
         contacts = newContacts
         notifyDataSetChanged()
     }

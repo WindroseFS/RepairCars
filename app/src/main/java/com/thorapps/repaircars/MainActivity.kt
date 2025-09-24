@@ -18,27 +18,24 @@ class MainActivity : AppCompatActivity() {
 
         dbHelper = DatabaseHelper(this)
 
-        // Configuração dos botões
+        // Botões
         binding.btnChat.setOnClickListener {
             startActivity(Intent(this, ChatActivity::class.java))
         }
-
-        binding.btnLogout.setOnClickListener {
-            finish() // Volta para LoginActivity
-        }
-
+        binding.btnLogout.setOnClickListener { finish() }
         binding.btnViewDatabase.setOnClickListener {
             startActivity(Intent(this, DatabaseViewerActivity::class.java))
         }
 
-        // Configuração do RecyclerView para contatos
-        contactsAdapter = ContactsAdapter(dbHelper.getAllContacts()) { contact ->
+        // Adapter
+        contactsAdapter = ContactsAdapter(dbHelper.getContactsWithLastMessage()) { contact ->
             val intent = Intent(this, ChatActivity::class.java).apply {
-                putExtra("CONTACT_ID", contact.id)
+                putExtra("CONTACT_ID", contact.id) // Long
                 putExtra("CONTACT_NAME", contact.name)
             }
             startActivity(intent)
         }
+
 
         binding.contactsRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -48,7 +45,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Atualiza a lista quando a activity retornar
-        contactsAdapter.updateContacts(dbHelper.getAllContacts())
+        contactsAdapter.updateContacts(dbHelper.getContactsWithLastMessage())
     }
 }

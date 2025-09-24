@@ -20,8 +20,11 @@ room = "2.7.2"
 coroutines = "1.10.2"
 playServicesLocation = "21.3.0"
 firebaseBom = "32.3.0"
+google-services = "4.4.2"
+core = "1.12.0"
 
 [libraries]
+androidx-core = { group = "androidx.core", name = "core", version.ref = "core" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -60,3 +63,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 androidx-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigationFragmentKtx" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

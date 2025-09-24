@@ -1,34 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="?attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true">
+    android:padding="12dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/contactName"
+        android:id="@+id/tvContactName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold"/>
+        android:text="Nome do contato"
+        android:textStyle="bold"
+        android:textSize="16sp"/>
 
     <TextView
-        android:id="@+id/lastMessage"
+        android:id="@+id/tvLastMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textSize="14sp"
-        android:maxLines="1"
-        android:ellipsize="end"/>
-
-    <TextView
-        android:id="@+id/messageTime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textSize="12sp"
-        android:textColor="?android:attr/textColorSecondary"/>
+        android:text="Última mensagem"
+        android:textSize="14sp"/>
 </LinearLayout>

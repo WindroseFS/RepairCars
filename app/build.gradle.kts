@@ -14,6 +14,7 @@ android {
     defaultConfig {
         applicationId = "com.thorapps.repaircars"
         minSdk = 21
+        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -57,6 +58,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.androidx.core)
 
     // Location
     implementation(libs.play.services.location)
