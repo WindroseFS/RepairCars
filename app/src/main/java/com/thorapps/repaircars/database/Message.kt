@@ -1,16 +1,4 @@
-package com.thorapps.repaircars
-
-data class Contact(
-    val id: Long,
-    val name: String
-)
-
-data class ContactDisplay(
-    val id: Long,
-    val name: String,
-    val lastMessage: String
-)
-
+package com.thorapps.repaircars.database
 data class Message(
     val id: Long = 0,
     val contactId: Long = 0,

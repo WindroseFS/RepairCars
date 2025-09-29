@@ -64,8 +64,9 @@ dependencies {
     implementation(libs.play.services.location)
 
     // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.database)
+    implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
+    implementation("com.google.firebase:firebase-database-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
 
     // Room components
     implementation(libs.androidx.room.runtime)

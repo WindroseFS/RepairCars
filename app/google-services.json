@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "244406497597",
+    "project_id": "repair-cars",
+    "storage_bucket": "repair-cars.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:244406497597:android:36be0053ea45bb51c45554",
+        "android_client_info": {
+          "package_name": "com.thorapps.repaircars"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB103L8xlzxyDD97RjE7h_ZpssKjW611gw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
