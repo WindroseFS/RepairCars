@@ -1,59 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
+    android:background="#F5F5F5"
+    android:fitsSystemWindows="true">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:background="#03A9F4">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
+        <!-- Botão Novo Chat -->
+        <Button
+            android:id="@+id/btnNewChat"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Novo Chat"
+            android:layout_marginBottom="16dp"
+            android:drawableStart="@android:drawable/ic_input_add"
+            android:drawablePadding="8dp"
+            android:background="#2196F3"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Botões superiores -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="16dp"
-            app:layout_scrollFlags="scroll|enterAlways">
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
 
             <Button
                 android:id="@+id/btnChat"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="Novo Chat"
+                android:text="Chat"
                 android:layout_marginEnd="8dp"
-                style="@style/Widget.AppCompat.Button.Colored"/>
+                android:background="#2196F3"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnViewDatabase"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="Ver DB"
+                android:text="Ver BD"
+                android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
-                style="@style/Widget.AppCompat.Button.Colored"/>
+                android:background="#2196F3"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/btnLogout"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:text="Sair"
-                style="@style/Widget.AppCompat.Button.Colored"/>
-        </LinearLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+                android:layout_marginStart="8dp"
+                android:background="#FF5252"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-    <!-- Lista de contatos -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/contactsRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        </LinearLayout>
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginVertical="16dp" />
+
+        <!-- Estado vazio -->
+        <TextView
+            android:id="@+id/tvEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nenhum contato encontrado\nToque no botão 'Novo Chat' para criar um novo chat"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone" />
+
+        <!-- Lista de contatos -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contactsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/white"
+            android:padding="8dp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

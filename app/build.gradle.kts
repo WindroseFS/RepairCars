@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.thorapps.repaircars"
-        minSdk = 21
+        minSdk = 23
         //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 1
@@ -71,6 +71,7 @@ dependencies {
     // Room components
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.activity)
     kapt(libs.androidx.room.compiler)
 
     // Coroutines

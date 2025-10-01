@@ -5,6 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.thorapps.repaircars.database.Message
+
 
 class MessagesAdapter(private var messages: List<Message> = emptyList()) :
     RecyclerView.Adapter<MessagesAdapter.MessageViewHolder>() {

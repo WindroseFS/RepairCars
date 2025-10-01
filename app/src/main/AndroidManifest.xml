@@ -3,14 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
-    <!-- Localização aproximada -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <!-- Localização precisa -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
-    <!-- Necessário no Android 10+ para pegar localização em segundo plano -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
@@ -23,30 +17,27 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RepairCars"
         tools:targetApi="31">
-
-        <!-- LoginActivity como atividade principal -->
+        <activity
+            android:name=".NewChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.DatabaseViewerActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" /> <!-- LoginActivity as main activity -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- MainActivity -->
+        </activity> <!-- MainActivity -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
-
-        <!-- ChatActivity -->
+            android:exported="false" /> <!-- ChatActivity -->
         <activity
             android:name=".ChatActivity"
-            android:exported="false" />
-
-        <!-- DatabaseViewerActivity -->
-        <activity
-            android:name=".DatabaseViewerActivity"
             android:exported="false" />
     </application>
 

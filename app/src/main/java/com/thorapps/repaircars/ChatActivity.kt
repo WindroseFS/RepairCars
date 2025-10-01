@@ -25,7 +25,10 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.thorapps.repaircars.databinding.ActivityChatBinding
 import kotlinx.coroutines.launch
-
+import com.thorapps.repaircars.database.DatabaseHelper
+import com.thorapps.repaircars.database.Message
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 class ChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChatBinding
@@ -201,10 +204,14 @@ class ChatActivity : AppCompatActivity() {
 
     private fun refreshMessages() {
         lifecycleScope.launch {
-            val messages = dbHelper.getMessagesForContact(contactId)
-            runOnUiThread {
+            try {
+                val messages = withContext(Dispatchers.IO) {
+                    dbHelper.getMessagesForContact(contactId)
+                }
                 messagesAdapter.updateMessages(messages)
                 scrollToBottom()
+            } catch (e: Exception) {
+                Log.e("ChatActivity", "Error refreshing messages: ${e.message}")
             }
         }
     }

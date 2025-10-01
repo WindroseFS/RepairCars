@@ -4,5 +4,6 @@ data class ContactDisplay(
     val id: Long,
     val name: String,
     val email: String,
-    val lastMessage: String
+    val lastMessage: String? = null,
+    val timestamp: Long = System.currentTimeMillis()
 )
