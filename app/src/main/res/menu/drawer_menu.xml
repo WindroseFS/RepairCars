@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_chat"
+        android:title="Chat"
+        android:icon="@android:drawable/ic_menu_send" />
+
+    <item
+        android:id="@+id/nav_news"
+        android:title="Notícias"
+        android:icon="@android:drawable/ic_menu_info_details" />
+
+    <item
+        android:id="@+id/nav_logout"
+        android:title="Sair da conta"
+        android:icon="@android:drawable/ic_lock_power_off" />
+
+    <item
+        android:id="@+id/nav_exit"
+        android:title="Sair do app"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel" />
+
+</menu>
