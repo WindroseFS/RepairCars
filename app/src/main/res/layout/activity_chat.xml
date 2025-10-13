@@ -6,7 +6,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
+    android:background="@color/white"
     tools:context=".ChatActivity">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:titleTextColor="@android:color/white"
+        app:title="Chat" />
 
     <!-- Área de mensagens -->
     <androidx.recyclerview.widget.RecyclerView
@@ -16,37 +27,62 @@
         android:layout_weight="1"
         android:padding="8dp"
         android:clipToPadding="false"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        android:background="@color/light_gray" />
 
     <!-- Área de entrada de mensagem -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp"
-        android:background="#2196F3">
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        android:elevation="8dp">
 
+        <!-- Botão de localização -->
+        <ImageButton
+            android:id="@+id/btnLocation"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_menu_mylocation"
+            android:contentDescription="Enviar localização"
+            app:tint="@color/blue" />
+
+        <!-- Campo de texto -->
         <EditText
             android:id="@+id/etMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:autofillHints=""
-            android:hint="Digite sua mensagem"
+            android:hint="Digite sua mensagem..."
             android:inputType="textMultiLine"
             android:maxLines="3"
             android:minHeight="48dp"
-            android:background="?android:colorBackground"
-            tools:ignore="HardcodedText" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@drawable/edittext_background"
+            android:textColor="@color/black"
+            android:textColorHint="@color/gray"
+            android:textSize="16sp" />
 
+        <!-- Botão de envio -->
         <Button
             android:id="@+id/btnSend"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="12dp"
             android:text="Enviar"
-            android:backgroundTint="#00BCD4"
-            android:textColor="@android:color/white" />
+            android:backgroundTint="@color/blue"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp" />
+
     </LinearLayout>
 
 </LinearLayout>

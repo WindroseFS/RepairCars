@@ -1,62 +1,40 @@
 package com.thorapps.repaircars
 
 import android.Manifest
-import android.app.Notification
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.thorapps.repaircars.databinding.ActivityChatBinding
-import kotlinx.coroutines.launch
 import com.thorapps.repaircars.database.DatabaseHelper
-import com.thorapps.repaircars.database.Message
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
+
 class ChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChatBinding
     private lateinit var dbHelper: DatabaseHelper
-    private lateinit var messagesAdapter: MessagesAdapter
-    private var contactId: Long = -1L
-    private var contactName: String = ""
-
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var lastKnownLocation: Location? = null
-
-    private val database = FirebaseDatabase.getInstance()
     private lateinit var messagesRef: DatabaseReference
+    private var contactId: Long = 0
+    private var lastKnownLocation: Location? = null
 
     companion object {
         private const val CHANNEL_ID = "messages_channel"
-        private const val NOTIFICATION_ID = 1001
-    }
-
-    // Registrar para resultado de permissão de localização
-    private val locationPermissionRequest = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            getLastKnownLocation()
-        } else {
-            Log.w("ChatActivity", "Permissão de localização negada pelo usuário")
-        }
+        private const val TAG = "ChatActivity"
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 100
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,61 +42,38 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        createNotificationChannel()
-
-        // Recupera dados do contato
-        contactId = intent.getLongExtra("CONTACT_ID", -1L)
-        if (contactId == -1L) { finish(); return }
-        contactName = intent.getStringExtra("CONTACT_NAME") ?: "Contato Desconhecido"
-
         dbHelper = DatabaseHelper(this)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        messagesRef = database.getReference("messages").child(contactId.toString())
+        contactId = intent.getLongExtra("contact_id", 0)
 
-        setupActionBar()
+        val database = FirebaseDatabase.getInstance()
+        messagesRef = database.getReference("messages/$contactId")
+
         setupRecyclerView()
         setupSendButton()
-
-        // Cancelar notificação ao abrir o chat
-        cancelNotification()
-        requestLocationPermission()
-        listenForMessages()
-    }
-
-    private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Mensagens",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notificações de mensagens"
-            }
-
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
-    private fun setupActionBar() {
-        supportActionBar?.apply {
-            title = contactName
-            setDisplayHomeAsUpEnabled(true)
-        }
+        setupLocationButton()
+        createNotificationChannel()
+        loadMessages()
     }
 
     private fun setupRecyclerView() {
+        binding.messagesRecyclerView.layoutManager = LinearLayoutManager(this)
+        refreshMessages()
+    }
+
+    private fun refreshMessages() {
         lifecycleScope.launch {
-            val messages = dbHelper.getMessagesForContact(contactId)
-            messagesAdapter = MessagesAdapter(messages)
-            binding.messagesRecyclerView.apply {
-                layoutManager = LinearLayoutManager(this@ChatActivity).apply {
-                    stackFromEnd = true
+            try {
+                val messages = dbHelper.getMessagesForContact(contactId)
+                val adapter = MessagesAdapter(messages)
+                binding.messagesRecyclerView.adapter = adapter
+                // Adicionar verificação para lista vazia
+                if (messages.isNotEmpty()) {
+                    binding.messagesRecyclerView.scrollToPosition(messages.size - 1)
                 }
-                adapter = messagesAdapter
-                setHasFixedSize(true)
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao carregar mensagens: ${e.message}")
+                Toast.makeText(this@ChatActivity, "Erro ao carregar mensagens", Toast.LENGTH_SHORT).show()
             }
-            scrollToBottom()
         }
     }
 
@@ -127,197 +82,161 @@ class ChatActivity : AppCompatActivity() {
             val messageText = binding.etMessage.text.toString().trim()
             if (messageText.isEmpty()) return@setOnClickListener
 
-            // Verificar se temos permissão de localização antes de obter a localização
-            val lat = if (hasLocationPermission()) {
-                lastKnownLocation?.latitude
-            } else {
-                null
-            }
-
-            val lng = if (hasLocationPermission()) {
-                lastKnownLocation?.longitude
-            } else {
-                null
-            }
-
             lifecycleScope.launch {
-                // Firebase
+                try {
+                    val messageId = messagesRef.push().key ?: return@launch
+                    val data = mapOf(
+                        "text" to messageText,
+                        "sender" to "me",
+                        "timestamp" to System.currentTimeMillis()
+                    )
+
+                    messagesRef.child(messageId).setValue(data)
+                    // Corrigido: passando true para isSentByMe
+                    dbHelper.addMessage(contactId, messageText, true, null, null)
+
+                    runOnUiThread {
+                        binding.etMessage.text.clear()
+                        refreshMessages()
+                        showNotification()
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Erro ao enviar mensagem: ${e.message}")
+                    runOnUiThread {
+                        Toast.makeText(this@ChatActivity, "Erro ao enviar mensagem", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupLocationButton() {
+        binding.btnLocation?.setOnClickListener {
+            getLastKnownLocationAndSend()
+        } ?: run {
+            Log.d(TAG, "Botão de localização não encontrado no layout")
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getLastKnownLocationAndSend() {
+        if (!hasLocationPermission()) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+            return
+        }
+
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        try {
+            val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+
+            if (location != null) {
+                lastKnownLocation = location
+                sendLocationMessage(location)
+            } else {
+                Toast.makeText(this, "Não foi possível obter a localização", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Erro de permissão de localização: ${e.message}")
+            Toast.makeText(this, "Permissão de localização negada", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao obter localização: ${e.message}")
+            Toast.makeText(this, "Erro ao obter localização", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onRequestPermissionsReceived(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsReceived(requestCode, permissions, grantResults)
+        when (requestCode) {
+            LOCATION_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLastKnownLocationAndSend()
+                } else {
+                    Toast.makeText(this, "Permissão de localização necessária", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun sendLocationMessage(location: Location) {
+        val messageText = "Minha localização: https://maps.google.com/?q=${location.latitude},${location.longitude}"
+
+        lifecycleScope.launch {
+            try {
                 val messageId = messagesRef.push().key ?: return@launch
                 val data = mapOf(
                     "text" to messageText,
                     "sender" to "me",
                     "timestamp" to System.currentTimeMillis(),
-                    "latitude" to lat,
-                    "longitude" to lng
+                    "latitude" to location.latitude,
+                    "longitude" to location.longitude
                 )
-                messagesRef.child(messageId).setValue(data)
 
-                // DBHelper
-                dbHelper.addMessage(contactId, messageText, true, lat, lng)
+                messagesRef.child(messageId).setValue(data)
+                // Corrigido: passando true para isSentByMe
+                dbHelper.addMessage(contactId, messageText, true, location.latitude, location.longitude)
 
                 runOnUiThread {
-                    binding.etMessage.text.clear()
                     refreshMessages()
                     showNotification()
                 }
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao enviar localização: ${e.message}")
+                runOnUiThread {
+                    Toast.makeText(this@ChatActivity, "Erro ao enviar localização", Toast.LENGTH_SHORT).show()
+                }
             }
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Mensagens",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Notificações de novas mensagens"
+            }
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
         }
     }
 
     private fun showNotification() {
         try {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_message)
                 .setContentTitle("Nova mensagem")
-                .setContentText("Para: $contactName")
-                .setSmallIcon(android.R.drawable.ic_dialog_email)
+                .setContentText("Mensagem enviada com sucesso")
                 .setAutoCancel(true)
                 .build()
 
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(contactId.toInt(), notification)
-        } catch (e: SecurityException) {
-            Log.e("ChatActivity", "Erro ao mostrar notificação: ${e.message}")
         } catch (e: Exception) {
-            Log.e("ChatActivity", "Erro inesperado ao mostrar notificação: ${e.message}")
+            Log.e(TAG, "Erro ao mostrar notificação: ${e.message}")
         }
     }
 
-    private fun cancelNotification() {
-        try {
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.cancel(contactId.toInt())
-        } catch (e: SecurityException) {
-            Log.e("ChatActivity", "Erro ao cancelar notificação: ${e.message}")
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
+    private fun loadMessages() {
         refreshMessages()
-        cancelNotification()
-
-        // Verificar permissão antes de obter localização
-        if (hasLocationPermission()) {
-            getLastKnownLocation()
-        }
-    }
-
-    private fun refreshMessages() {
-        lifecycleScope.launch {
-            try {
-                val messages = withContext(Dispatchers.IO) {
-                    dbHelper.getMessagesForContact(contactId)
-                }
-                messagesAdapter.updateMessages(messages)
-                scrollToBottom()
-            } catch (e: Exception) {
-                Log.e("ChatActivity", "Error refreshing messages: ${e.message}")
-            }
-        }
-    }
-
-    private fun scrollToBottom() {
-        if (messagesAdapter.itemCount > 0) {
-            binding.messagesRecyclerView.postDelayed({
-                binding.messagesRecyclerView.smoothScrollToPosition(messagesAdapter.itemCount - 1)
-            }, 100)
-        }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
-    }
-
-    // Verificar se a permissão de localização foi concedida
-    private fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestLocationPermission() {
-        if (hasLocationPermission()) {
-            getLastKnownLocation()
-        } else {
-            // Solicitar permissão apenas se não tiver sido concedida
-            locationPermissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        }
-    }
-
-    private fun getLastKnownLocation() {
-        // Verificar explicitamente a permissão antes de acessar a localização
-        if (!hasLocationPermission()) {
-            Log.w("ChatActivity", "Permissão de localização não concedida")
-            return
-        }
-
-        try {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                if (location != null) {
-                    lastKnownLocation = location
-                    Log.d("ChatActivity", "Última localização: ${location.latitude}, ${location.longitude}")
-                } else {
-                    Log.d("ChatActivity", "Localização não disponível")
-                }
-            }.addOnFailureListener { exception ->
-                Log.e("ChatActivity", "Erro ao obter localização: ${exception.message}")
-            }
-        } catch (e: SecurityException) {
-            Log.e("ChatActivity", "Erro de segurança ao acessar localização: ${e.message}")
-        }
-    }
-
-    private fun listenForMessages() {
-        messagesRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val messages = mutableListOf<Message>()
-                snapshot.children.forEach { ds ->
-                    val text = ds.child("text").getValue(String::class.java) ?: ""
-                    val sender = ds.child("sender").getValue(String::class.java) ?: "unknown"
-                    val timestamp = ds.child("timestamp").getValue(Long::class.java) ?: System.currentTimeMillis()
-                    val lat = ds.child("latitude").getValue(Double::class.java)
-                    val lng = ds.child("longitude").getValue(Double::class.java)
-
-                    messages.add(Message(
-                        text = text,
-                        sender = sender,
-                        timestamp = timestamp,
-                        latitude = lat,
-                        longitude = lng
-                    ))
-                }
-                lifecycleScope.launch {
-                    runOnUiThread {
-                        messagesAdapter.updateMessages(messages)
-                        scrollToBottom()
-                    }
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("ChatActivity", "Erro ao ler mensagens: $error")
-            }
-        })
-    }
-
-    // Tratamento seguro para onRequestPermissionsResult (para versões mais antigas)
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        // Para compatibilidade com versões mais antigas
-        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION) {
-                getLastKnownLocation()
-            }
-        } else {
-            Log.w("ChatActivity", "Permissão de localização negada pelo usuário")
-        }
     }
 }
