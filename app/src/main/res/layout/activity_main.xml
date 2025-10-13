@@ -1,57 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    tools:context=".MainActivity">
 
     <!-- Conteúdo principal -->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="#F5F5F5"
-        android:padding="16dp">
+        android:background="@color/light_gray">
 
+        <!-- Toolbar -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             android:titleTextColor="@android:color/white"
             android:elevation="4dp"
-            android:title="Repair Cars" />
+            android:title="Repair Cars"
+            app:navigationIcon="@drawable/ic_menu_white" />
 
-        <!-- Conteúdo original -->
-        <Button
-            android:id="@+id/btnNewChat"
+        <!-- Conteúdo -->
+        <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Novo Chat"
-            android:layout_marginBottom="16dp"
-            android:drawableStart="@android:drawable/ic_input_add"
-            android:drawablePadding="8dp"
-            android:background="#2196F3"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content"
+            android:layout_below="@id/toolbar"
+            android:text="Conversas"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:padding="16dp" />
 
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            android:layout_marginVertical="16dp" />
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvEmptyState"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nenhum contato encontrado\nToque no botão 'Novo Chat' para criar um novo chat"
+            android:layout_centerInParent="true"
+            android:text="Nenhuma conversa encontrada\nToque no botão + para iniciar um novo chat"
             android:textSize="16sp"
-            android:textColor="#666666"
+            android:textColor="@color/gray"
             android:gravity="center"
             android:padding="32dp"
             android:visibility="gone" />
@@ -59,11 +60,27 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/contactsRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:background="@android:color/white"
-            android:padding="8dp" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_below="@id/tvTitle"
+            android:background="@color/white"
+            android:padding="8dp"
+            android:clipToPadding="false" />
+
+        <!-- Botão flutuante para nova mensagem -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabNewMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_add_white"
+            android:contentDescription="Nova mensagem"
+            app:backgroundTint="@color/blue"
+            app:elevation="8dp"
+            app:tint="@color/white" />
+
+    </RelativeLayout>
 
     <!-- Menu lateral -->
     <com.google.android.material.navigation.NavigationView
@@ -71,7 +88,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/drawer_menu"
-        app:headerLayout="@layout/drawer_header" />
+        android:background="@color/white"
+        app:headerLayout="@layout/nav_header_main"
+        app:menu="@menu/nav_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
