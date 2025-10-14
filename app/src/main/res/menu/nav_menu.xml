@@ -1,32 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_contacts"
             android:icon="@android:drawable/ic_menu_my_calendar"
-            android:title="Contacts" />
+            android:title="Contatos" />
         <item
             android:id="@+id/nav_services"
             android:icon="@android:drawable/ic_menu_manage"
-            android:title="Services" />
+            android:title="Serviços" />
         <item
             android:id="@+id/nav_customers"
             android:icon="@android:drawable/ic_menu_myplaces"
-            android:title="Customers" />
+            android:title="Clientes" />
     </group>
-
-    <item android:title="Settings">
-        <menu>
-            <item
-                android:id="@+id/nav_settings"
-                android:icon="@android:drawable/ic_menu_preferences"
-                android:title="Settings" />
-            <item
-                android:id="@+id/nav_help"
-                android:icon="@android:drawable/ic_menu_help"
-                android:title="Help" />
-        </menu>
-    </item>
-
 </menu>

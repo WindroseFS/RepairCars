@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -42,8 +43,8 @@ class ChatActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         dbHelper = DatabaseHelper(this)
-        contactId = intent.getLongExtra("contact_id", 0)
-        val contactName = intent.getStringExtra("contact_name") ?: "Contato"
+        contactId = intent.getLongExtra("CONTACT_ID", 0)
+        val contactName = intent.getStringExtra("CONTACT_NAME") ?: "Contato"
 
         supportActionBar?.title = contactName
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -55,11 +56,20 @@ class ChatActivity : AppCompatActivity() {
         setupSendButton()
         setupLocationButton()
         createNotificationChannel()
+        setupBackPressedHandler()
         loadMessages()
     }
 
+    private fun setupBackPressedHandler() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
+    }
+
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
         return true
     }
 

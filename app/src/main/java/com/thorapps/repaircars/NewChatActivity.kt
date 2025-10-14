@@ -3,6 +3,7 @@ package com.thorapps.repaircars
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.thorapps.repaircars.databinding.ActivityNewChatBinding
 import com.thorapps.repaircars.database.DatabaseHelper
@@ -23,6 +24,15 @@ class NewChatActivity : AppCompatActivity() {
 
         dbHelper = DatabaseHelper(this)
         setupViews()
+        setupBackPressedHandler()
+    }
+
+    private fun setupBackPressedHandler() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                navigateToMainActivity()
+            }
+        })
     }
 
     private fun setupViews() {
@@ -121,11 +131,10 @@ class NewChatActivity : AppCompatActivity() {
     }
 
     private fun navigateToMainActivity() {
-        startActivity(Intent(this, MainActivity::class.java))
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        startActivity(intent)
         finish()
-    }
-
-    override fun onBackPressed() {
-        navigateToMainActivity()
     }
 }

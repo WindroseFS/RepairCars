@@ -5,32 +5,25 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/nav_contacts">
 
+    <!-- Fragmento de Contatos -->
     <fragment
         android:id="@+id/nav_contacts"
-        android:name="com.thorapps.repaircars.ContactsFragment"
-        android:label="@string/title_contacts"
+        android:name="com.thorapps.repaircars.ui.contacts.ContactsFragment"
+        android:label="Contatos"
         tools:layout="@layout/fragment_contacts" />
 
+    <!-- Fragmento de Serviços -->
     <fragment
         android:id="@+id/nav_services"
-        android:name="com.thorapps.repaircars.ServicesFragment"
-        android:label="@string/title_services"
+        android:name="com.thorapps.repaircars.ui.services.ServicesFragment"
+        android:label="Serviços"
         tools:layout="@layout/fragment_services" />
 
+    <!-- Fragmento de Clientes -->
     <fragment
         android:id="@+id/nav_customers"
-        android:name="com.thorapps.repaircars.CustomersFragment"
-        android:label="@string/title_customers"
+        android:name="com.thorapps.repaircars.ui.customers.CustomersFragment"
+        android:label="Clientes"
         tools:layout="@layout/fragment_customers" />
-
-    <fragment
-        android:id="@+id/nav_settings"
-        android:name="com.thorapps.repaircars.SettingsFragment"
-        android:label="@string/title_settings" />
-
-    <fragment
-        android:id="@+id/nav_help"
-        android:name="com.thorapps.repaircars.HelpFragment"
-        android:label="@string/title_help" />
 
 </navigation>
