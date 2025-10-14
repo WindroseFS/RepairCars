@@ -25,7 +25,6 @@ class NotificationsViewModel : ViewModel() {
             _notificationsState.value = NotificationsState.Loading
 
             try {
-                // Simular carregamento de notificações
                 delay(600)
 
                 val mockNotifications = listOf(
@@ -33,7 +32,7 @@ class NotificationsViewModel : ViewModel() {
                         id = 1,
                         title = "Novo agendamento",
                         message = "Cliente João agendou troca de óleo para amanhã",
-                        timestamp = System.currentTimeMillis() - 1000 * 60 * 30, // 30 minutos atrás
+                        timestamp = System.currentTimeMillis() - 1000 * 60 * 30,
                         type = NotificationType.APPOINTMENT,
                         isRead = false
                     ),
@@ -41,17 +40,9 @@ class NotificationsViewModel : ViewModel() {
                         id = 2,
                         title = "Peça chegou",
                         message = "Pastilhas de freio para Honda Civic estão disponíveis",
-                        timestamp = System.currentTimeMillis() - 1000 * 60 * 60 * 2, // 2 horas atrás
+                        timestamp = System.currentTimeMillis() - 1000 * 60 * 60 * 2,
                         type = NotificationType.STOCK,
                         isRead = true
-                    ),
-                    Notification(
-                        id = 3,
-                        title = "Pagamento confirmado",
-                        message = "Pagamento de R$ 350,00 confirmado para serviço #1234",
-                        timestamp = System.currentTimeMillis() - 1000 * 60 * 60 * 5, // 5 horas atrás
-                        type = NotificationType.PAYMENT,
-                        isRead = false
                     )
                 )
 
@@ -72,6 +63,7 @@ class NotificationsViewModel : ViewModel() {
                     notification
                 }
             }
+            _notificationsState.value = NotificationsState.Success(_notifications.value)
         }
     }
 
@@ -80,6 +72,7 @@ class NotificationsViewModel : ViewModel() {
             _notifications.value = _notifications.value.map { notification ->
                 notification.copy(isRead = true)
             }
+            _notificationsState.value = NotificationsState.Success(_notifications.value)
         }
     }
 

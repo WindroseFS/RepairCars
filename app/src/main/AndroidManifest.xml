@@ -21,10 +21,6 @@
             android:name=".NewChatActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.DatabaseViewerActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" /> <!-- LoginActivity as main activity -->
-        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>

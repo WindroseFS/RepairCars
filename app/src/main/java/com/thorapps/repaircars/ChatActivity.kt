@@ -29,7 +29,6 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var dbHelper: DatabaseHelper
     private lateinit var messagesRef: DatabaseReference
     private var contactId: Long = 0
-    private var lastKnownLocation: Location? = null
 
     companion object {
         private const val CHANNEL_ID = "messages_channel"
@@ -44,6 +43,10 @@ class ChatActivity : AppCompatActivity() {
 
         dbHelper = DatabaseHelper(this)
         contactId = intent.getLongExtra("contact_id", 0)
+        val contactName = intent.getStringExtra("contact_name") ?: "Contato"
+
+        supportActionBar?.title = contactName
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val database = FirebaseDatabase.getInstance()
         messagesRef = database.getReference("messages/$contactId")
@@ -55,6 +58,11 @@ class ChatActivity : AppCompatActivity() {
         loadMessages()
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
+    }
+
     private fun setupRecyclerView() {
         binding.messagesRecyclerView.layoutManager = LinearLayoutManager(this)
         refreshMessages()
@@ -64,9 +72,9 @@ class ChatActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val messages = dbHelper.getMessagesForContact(contactId)
-                val adapter = MessagesAdapter(messages)
+                val adapter = MessagesAdapter()
+                adapter.submitList(messages)
                 binding.messagesRecyclerView.adapter = adapter
-                // Adicionar verificação para lista vazia
                 if (messages.isNotEmpty()) {
                     binding.messagesRecyclerView.scrollToPosition(messages.size - 1)
                 }
@@ -92,7 +100,6 @@ class ChatActivity : AppCompatActivity() {
                     )
 
                     messagesRef.child(messageId).setValue(data)
-                    // Corrigido: passando true para isSentByMe
                     dbHelper.addMessage(contactId, messageText, true, null, null)
 
                     runOnUiThread {
@@ -136,7 +143,6 @@ class ChatActivity : AppCompatActivity() {
                 ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
 
             if (location != null) {
-                lastKnownLocation = location
                 sendLocationMessage(location)
             } else {
                 Toast.makeText(this, "Não foi possível obter a localização", Toast.LENGTH_SHORT).show()
@@ -158,12 +164,12 @@ class ChatActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    override fun onRequestPermissionsReceived(
+    override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        super.onRequestPermissionsReceived(requestCode, permissions, grantResults)
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             LOCATION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -190,7 +196,6 @@ class ChatActivity : AppCompatActivity() {
                 )
 
                 messagesRef.child(messageId).setValue(data)
-                // Corrigido: passando true para isSentByMe
                 dbHelper.addMessage(contactId, messageText, true, location.latitude, location.longitude)
 
                 runOnUiThread {
@@ -224,7 +229,7 @@ class ChatActivity : AppCompatActivity() {
         try {
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_message)
+                .setSmallIcon(android.R.drawable.ic_dialog_email)
                 .setContentTitle("Nova mensagem")
                 .setContentText("Mensagem enviada com sucesso")
                 .setAutoCancel(true)

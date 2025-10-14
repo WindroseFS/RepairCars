@@ -18,14 +18,12 @@ class DashboardViewModel : ViewModel() {
             _dashboardState.value = DashboardState.Loading
 
             try {
-                // Simular carregamento de dados
                 delay(1000)
 
                 val mockData = DashboardData(
                     activeRepairs = 5,
                     completedToday = 3,
-                    pendingRequests = 2,
-                    revenue = 1250.50
+                    pendingRequests = 2
                 )
 
                 _dashboardState.value = DashboardState.Success(mockData)
@@ -45,6 +43,5 @@ sealed class DashboardState {
 data class DashboardData(
     val activeRepairs: Int,
     val completedToday: Int,
-    val pendingRequests: Int,
-    val revenue: Double
+    val pendingRequests: Int
 )

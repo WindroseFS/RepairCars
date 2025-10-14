@@ -9,10 +9,10 @@
     tools:context=".MainActivity">
 
     <!-- Conteúdo principal -->
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/light_gray">
+        android:orientation="vertical">
 
         <!-- Toolbar -->
         <androidx.appcompat.widget.Toolbar
@@ -23,64 +23,19 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             android:titleTextColor="@android:color/white"
             android:elevation="4dp"
-            android:title="Repair Cars"
-            app:navigationIcon="@drawable/ic_menu_white" />
+            android:title="Repair Cars" />
 
-        <!-- Conteúdo -->
-        <TextView
-            android:id="@+id/tvTitle"
+        <!-- Navigation Host Fragment -->
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_host_fragment_content_main"
+            android:name="androidx.navigation.fragment.NavHostFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/toolbar"
-            android:text="Conversas"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"
-            android:padding="16dp" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/nav_graph" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/tvEmptyState"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Nenhuma conversa encontrada\nToque no botão + para iniciar um novo chat"
-            android:textSize="16sp"
-            android:textColor="@color/gray"
-            android:gravity="center"
-            android:padding="32dp"
-            android:visibility="gone" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/contactsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/tvTitle"
-            android:background="@color/white"
-            android:padding="8dp"
-            android:clipToPadding="false" />
-
-        <!-- Botão flutuante para nova mensagem -->
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fabNewMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_add_white"
-            android:contentDescription="Nova mensagem"
-            app:backgroundTint="@color/blue"
-            app:elevation="8dp"
-            app:tint="@color/white" />
-
-    </RelativeLayout>
+    </LinearLayout>
 
     <!-- Menu lateral -->
     <com.google.android.material.navigation.NavigationView

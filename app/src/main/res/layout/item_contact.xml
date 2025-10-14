@@ -4,33 +4,35 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <TextView
-        android:id="@+id/tvName"
+        android:id="@+id/textContactName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="Contact Name"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:text="Nome do Contato" />
+        android:textColor="?android:attr/textColorPrimary" />
 
     <TextView
-        android:id="@+id/tvEmail"
+        android:id="@+id/textContactEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="contact@example.com"
         android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
-        android:text="email@exemplo.com" />
+        android:textColor="?android:attr/textColorSecondary"
+        android:layout_marginTop="4dp" />
 
-    <!-- Add this for last message -->
     <TextView
-        android:id="@+id/tvLastMessage"
+        android:id="@+id/textContactPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textColor="#666666"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:text="Última mensagem..." />
+        android:text="123-456-7890"
+        android:textSize="14sp"
+        android:textColor="?android:attr/textColorSecondary"
+        android:layout_marginTop="2dp" />
 
 </LinearLayout>
