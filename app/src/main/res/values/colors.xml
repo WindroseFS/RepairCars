@@ -27,4 +27,14 @@
     <color name="surface">#FFFFFF</color>
     <color name="on_surface">#000000</color>
     <color name="dark_surface">#1E1E1E</color>
+
+    <!-- Cores usadas em backgrounds -->
+    <color name="red">#F44336</color>
+    <color name="blue">#2196F3</color>
+
+    <!-- Cores de gradiente -->
+    <color name="blue_light">#64B5F6</color>
+    <color name="blue_dark">#1976D2</color>
+    <color name="red_light">#EF5350</color>
+    <color name="red_dark">#C62828</color>
 </resources>

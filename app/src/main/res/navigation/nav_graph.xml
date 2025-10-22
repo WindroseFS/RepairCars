@@ -3,27 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/nav_contacts">
+    app:startDestination="@id/nav_home">
 
-    <!-- Fragmento de Contatos -->
+    <!-- Home Fragment -->
     <fragment
-        android:id="@+id/nav_contacts"
-        android:name="com.thorapps.repaircars.ui.contacts.ContactsFragment"
-        android:label="Contatos"
-        tools:layout="@layout/fragment_contacts" />
+        android:id="@+id/nav_home"
+        android:name="com.thorapps.repaircars.ui.home.HomeFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home" />
 
-    <!-- Fragmento de Serviços -->
+    <!-- Services Fragment -->
     <fragment
         android:id="@+id/nav_services"
         android:name="com.thorapps.repaircars.ui.services.ServicesFragment"
-        android:label="Serviços"
+        android:label="Services"
         tools:layout="@layout/fragment_services" />
 
-    <!-- Fragmento de Clientes -->
+    <!-- Customers Fragment -->
     <fragment
         android:id="@+id/nav_customers"
         android:name="com.thorapps.repaircars.ui.customers.CustomersFragment"
-        android:label="Clientes"
+        android:label="Customers"
         tools:layout="@layout/fragment_customers" />
-
 </navigation>
+
