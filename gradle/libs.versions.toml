@@ -1,6 +1,6 @@
 [versions]
 # Plugins - USE VERSÕES COMPATÍVEIS
-agp = "8.2.2"
+agp = "8.13.0"
 kotlin = "1.9.22"
 
 # Android SDK
