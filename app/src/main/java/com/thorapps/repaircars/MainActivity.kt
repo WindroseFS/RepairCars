@@ -2,7 +2,7 @@ package com.thorapps.repaircars
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -19,28 +19,41 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.toolbar)
+        setSupportActionBar(binding.appBarMain.toolbar)
 
-        // Pegando NavController do NavHostFragment
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
-        val navController = navHostFragment.navController
+        // Configuração da navegação
+        setupNavigation()
+    }
 
-        // Configurações do Drawer e top-level destinations
+    private fun setupNavigation() {
+        // Obtém o NavController do FragmentContainerView
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+
+        // Define os destinos de top-level para o Drawer
         appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.nav_home, R.id.nav_services, R.id.nav_customers),
+            setOf(
+                R.id.nav_home,
+                R.id.nav_dashboard,
+                R.id.nav_services,
+                R.id.nav_customers,
+                R.id.nav_chats,
+                R.id.nav_contacts,
+                R.id.nav_notifications,
+                R.id.nav_settings,
+                R.id.nav_help
+            ),
             binding.drawerLayout
         )
 
-        // Configura ActionBar e NavigationView com NavController
+        // Configura a ActionBar com o NavController
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        // Configura o NavigationView com o NavController
         binding.navView.setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
-        val navController = navHostFragment.navController
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

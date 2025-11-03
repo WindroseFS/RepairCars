@@ -3,16 +3,40 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:title="Início"
-            android:icon="@android:drawable/ic_menu_view" />
+            android:icon="@drawable/ic_home"
+            android:title="Home" />
+        <item
+            android:id="@+id/nav_dashboard"
+            android:icon="@drawable/ic_dashboard"
+            android:title="Dashboard" />
         <item
             android:id="@+id/nav_services"
-            android:title="Serviços"
-            android:icon="@android:drawable/ic_menu_manage" />
+            android:icon="@drawable/ic_services"
+            android:title="Services" />
         <item
             android:id="@+id/nav_customers"
-            android:title="Clientes"
-            android:icon="@android:drawable/ic_menu_myplaces" />
+            android:icon="@drawable/ic_customers"
+            android:title="Customers" />
+        <item
+            android:id="@+id/nav_chats"
+            android:icon="@drawable/ic_chat"
+            android:title="Chats" />
+        <item
+            android:id="@+id/nav_contacts"
+            android:icon="@drawable/ic_contacts"
+            android:title="Contacts" />
+        <item
+            android:id="@+id/nav_notifications"
+            android:icon="@drawable/ic_notifications"
+            android:title="Notifications" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="Settings" />
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/ic_help"
+            android:title="Help" />
     </group>
 </menu>
 
