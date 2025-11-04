@@ -1,4 +1,4 @@
-package com.thorapps.repaircars.ui.help
+package com.thorapps.repaircars.help
 
 import android.os.Bundle
 import android.view.LayoutInflater

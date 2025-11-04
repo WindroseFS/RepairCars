@@ -1,4 +1,4 @@
-package com.thorapps.repaircars.ui.contacts
+package com.thorapps.repaircars.contacts
 
 import android.view.LayoutInflater
 import android.view.View

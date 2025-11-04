@@ -1,15 +1,14 @@
-package com.thorapps.repaircars.ui.chats
+package com.thorapps.repaircars.notifications
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.thorapps.repaircars.databinding.FragmentChatsBinding
+import com.thorapps.repaircars.databinding.FragmentNotificationsBinding
 
-class ChatsFragment : Fragment() {
-
-    private var _binding: FragmentChatsBinding? = null
+class NotificationsFragment : Fragment() {
+    private var _binding: FragmentNotificationsBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -17,13 +16,8 @@ class ChatsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentChatsBinding.inflate(inflater, container, false)
+        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        // Implementar lista de chats aqui
     }
 
     override fun onDestroyView() {

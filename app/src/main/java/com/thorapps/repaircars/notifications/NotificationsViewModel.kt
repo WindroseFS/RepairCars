@@ -1,4 +1,4 @@
-package com.thorapps.repaircars.ui.notifications
+package com.thorapps.repaircars.notifications
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class NotificationsViewModel : ViewModel() {
+class NotificationsViewModel : androidx.lifecycle.ViewModel() {
 
     private val _notificationsState = MutableStateFlow<NotificationsState>(NotificationsState.Loading)
     val notificationsState: StateFlow<NotificationsState> = _notificationsState.asStateFlow()

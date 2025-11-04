@@ -1,4 +1,4 @@
-package com.thorapps.repaircars.ui.notifications
+package com.thorapps.repaircars.notifications
 
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -39,23 +39,56 @@ class NotificationsAdapter(
         fun bind(notification: Notification) {
             tvTitle.text = notification.title
             tvMessage.text = notification.message
-            tvTime.text = SimpleDateFormat("HH:mm", Locale.getDefault())
-                .format(Date(notification.timestamp))
+            tvTime.text = formatTime(notification.timestamp)
 
             // Marcar como lido/não lido
             dotUnread.visibility = if (notification.isRead) View.GONE else View.VISIBLE
 
             // Cor baseada no tipo
             val color = when (notification.type) {
-                NotificationType.APPOINTMENT -> Color.parseColor("#2196F3") // blue
-                NotificationType.STOCK -> Color.parseColor("#4CAF50") // green
-                NotificationType.PAYMENT -> Color.parseColor("#FF9800") // orange
-                NotificationType.SYSTEM -> Color.parseColor("#666666") // gray
-                NotificationType.ALERT -> Color.parseColor("#F44336") // red
+                NotificationType.APPOINTMENT -> Color.parseColor("#2196F3")
+                NotificationType.STOCK -> Color.parseColor("#4CAF50")
+                NotificationType.PAYMENT -> Color.parseColor("#FF9800")
+                NotificationType.SYSTEM -> Color.parseColor("#666666")
+                NotificationType.ALERT -> Color.parseColor("#F44336")
             }
 
             dotUnread.setBackgroundColor(color)
         }
+
+        private fun formatTime(timestamp: Long): String {
+            val now = System.currentTimeMillis()
+            val diff = now - timestamp
+
+            return when {
+                diff < 60000 -> "Agora" // Menos de 1 minuto
+                diff < 3600000 -> "${diff / 60000} min atrás" // Menos de 1 hora
+                diff < 86400000 -> "${diff / 3600000} h atrás" // Menos de 1 dia
+                else -> SimpleDateFormat("dd/MM/yy", Locale.getDefault())
+                    .format(Date(timestamp))
+            }
+        }
+    }
+
+    // Método para obter notificação por posição (se necessário)
+    fun getNotificationAt(position: Int): Notification {
+        return getItem(position)
+    }
+
+    // Método para atualizar uma notificação específica
+    fun updateNotification(notification: Notification) {
+        val currentList = currentList.toMutableList()
+        val position = currentList.indexOfFirst { it.id == notification.id }
+        if (position != -1) {
+            currentList[position] = notification
+            submitList(currentList)
+        }
+    }
+
+    // Método para marcar todas como lidas
+    fun markAllAsRead() {
+        val updatedList = currentList.map { it.copy(isRead = true) }
+        submitList(updatedList)
     }
 
     companion object NotificationDiffCallback : DiffUtil.ItemCallback<Notification>() {

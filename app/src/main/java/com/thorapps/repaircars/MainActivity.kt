@@ -16,20 +16,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
+        // Configurar a Toolbar
+        setSupportActionBar(binding.toolbar)
 
-        // Configuração da navegação
+        // Configurar navegação
         setupNavigation()
     }
 
     private fun setupNavigation() {
-        // Obtém o NavController do FragmentContainerView
+        // Obter o NavController
         val navController = findNavController(R.id.nav_host_fragment_content_main)
 
-        // Define os destinos de top-level para o Drawer
+        // Configurar TODOS os destinos de nível superior para o Drawer
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
@@ -45,10 +47,10 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout
         )
 
-        // Configura a ActionBar com o NavController
+        // Configurar ActionBar com NavController
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        // Configura o NavigationView com o NavController
+        // Configurar NavigationView com NavController
         binding.navView.setupWithNavController(navController)
     }
 

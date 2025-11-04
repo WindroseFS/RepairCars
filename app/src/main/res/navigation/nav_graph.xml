@@ -12,6 +12,13 @@
         android:label="Home"
         tools:layout="@layout/fragment_home" />
 
+    <!-- Dashboard Fragment -->
+    <fragment
+        android:id="@+id/nav_dashboard"
+        android:name="com.thorapps.repaircars.dashboard.DashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_dashboard" />
+
     <!-- Services Fragment -->
     <fragment
         android:id="@+id/nav_services"
@@ -25,5 +32,40 @@
         android:name="com.thorapps.repaircars.ui.customers.CustomersFragment"
         android:label="Customers"
         tools:layout="@layout/fragment_customers" />
-</navigation>
 
+    <!-- Chats Fragment -->
+    <fragment
+        android:id="@+id/nav_chats"
+        android:name="com.thorapps.repaircars.chats.ChatsFragment"
+        android:label="Chats"
+        tools:layout="@layout/fragment_chats" />
+
+    <!-- Contacts Fragment -->
+    <fragment
+        android:id="@+id/nav_contacts"
+        android:name="com.thorapps.repaircars.contacts.ContactsFragment"
+        android:label="Contacts"
+        tools:layout="@layout/fragment_contacts" />
+
+    <!-- Notifications Fragment -->
+    <fragment
+        android:id="@+id/nav_notifications"
+        android:name="com.thorapps.repaircars.notifications.NotificationsFragment"
+        android:label="Notifications"
+        tools:layout="@layout/fragment_notifications" />
+
+    <!-- Settings Fragment -->
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.thorapps.repaircars.settings.SettingsFragment"
+        android:label="Settings"
+        tools:layout="@layout/fragment_settings" />
+
+    <!-- Help Fragment -->
+    <fragment
+        android:id="@+id/nav_help"
+        android:name="com.thorapps.repaircars.help.HelpFragment"
+        android:label="Help"
+        tools:layout="@layout/fragment_help" />
+
+</navigation>

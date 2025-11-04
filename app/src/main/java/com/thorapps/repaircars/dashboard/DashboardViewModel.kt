@@ -1,4 +1,4 @@
-package com.thorapps.repaircars.ui.dashboard
+package com.thorapps.repaircars.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

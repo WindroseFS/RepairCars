@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/light_gray"
-    tools:context=".ui.chats.ChatsFragment">
+    tools:context=".chats.ChatsFragment">
 
     <TextView
         android:layout_width="match_parent"
