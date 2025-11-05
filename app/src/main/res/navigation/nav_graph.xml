@@ -3,15 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/nav_home">
+    app:startDestination="@id/nav_chats">
 
     <!-- Fragments Principais -->
-    <fragment
-        android:id="@+id/nav_home"
-        android:name="com.thorapps.repaircars.ui.home.HomeFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_home" />
-
     <fragment
         android:id="@+id/nav_chats"
         android:name="com.thorapps.repaircars.chats.ChatsFragment"
@@ -43,9 +37,22 @@
         android:label="Novo Chat" />
 
     <activity
-        android:id="@+id/nav_chat"
+        android:id="@+id/nav_chat_activity"
         android:name="com.thorapps.repaircars.ChatActivity"
-        android:label="Chat" />
+        android:label="Chat">
+        <!-- CORREÇÃO: Removido defaultValue para long ou usar 0L -->
+        <argument
+            android:name="CONTACT_ID"
+            app:argType="long" />
+        <argument
+            android:name="CONTACT_NAME"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="contactPhone"
+            app:argType="string"
+            android:defaultValue="" />
+    </activity>
 
     <activity
         android:id="@+id/nav_login"
@@ -59,32 +66,20 @@
 
     <!-- Ações de Navegação entre Fragments -->
     <action
-        android:id="@+id/action_home_to_chats"
-        app:destination="@id/nav_chats" />
-
-    <action
-        android:id="@+id/action_home_to_contacts"
-        app:destination="@id/nav_contacts" />
-
-    <action
-        android:id="@+id/action_home_to_profile"
-        app:destination="@id/nav_profile" />
-
-    <action
         android:id="@+id/action_chats_to_contacts"
         app:destination="@id/nav_contacts" />
 
     <action
-        android:id="@+id/action_chats_to_chat"
-        app:destination="@id/nav_chat" />
+        android:id="@+id/action_chats_to_chat_activity"
+        app:destination="@id/nav_chat_activity" />
 
     <action
         android:id="@+id/action_contacts_to_new_chat"
         app:destination="@id/nav_new_chat" />
 
     <action
-        android:id="@+id/action_contacts_to_chat"
-        app:destination="@id/nav_chat" />
+        android:id="@+id/action_contacts_to_chat_activity"
+        app:destination="@id/nav_chat_activity" />
 
     <action
         android:id="@+id/action_profile_to_settings"
@@ -94,7 +89,7 @@
     <action
         android:id="@+id/action_global_to_login"
         app:destination="@id/nav_login"
-        app:popUpTo="@id/nav_home"
+        app:popUpTo="@id/nav_chats"
         app:popUpToInclusive="true" />
 
     <action
@@ -102,8 +97,8 @@
         app:destination="@id/nav_register" />
 
     <action
-        android:id="@+id/action_global_to_chat"
-        app:destination="@id/nav_chat" />
+        android:id="@+id/action_global_to_chat_activity"
+        app:destination="@id/nav_chat_activity" />
 
     <!-- Deep Links (se necessário) -->
     <deepLink
@@ -111,24 +106,6 @@
         app:uri="repaircars://chat/{chatId}" />
 
     <!-- Argumentos para passagem de dados -->
-    <fragment
-        android:id="@+id/nav_chat"
-        android:name="com.thorapps.repaircars.ChatActivity"
-        android:label="Chat">
-        <argument
-            android:name="chatId"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="contactName"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="contactPhone"
-            app:argType="string"
-            android:defaultValue="" />
-    </fragment>
-
     <fragment
         android:id="@+id/nav_profile"
         android:name="com.thorapps.repaircars.profile.ProfileFragment"
@@ -142,15 +119,15 @@
     <!-- Navegação Aninhada (se usar bottom navigation ou drawer) -->
     <navigation
         android:id="@+id/nested_main_nav"
-        app:startDestination="@id/nav_home">
-        <fragment
-            android:id="@+id/nav_home"
-            android:name="com.thorapps.repaircars.ui.home.HomeFragment"
-            android:label="Home" />
+        app:startDestination="@id/nav_chats">
         <fragment
             android:id="@+id/nav_chats"
             android:name="com.thorapps.repaircars.chats.ChatsFragment"
             android:label="Conversas" />
+        <fragment
+            android:id="@+id/nav_contacts"
+            android:name="com.thorapps.repaircars.contacts.ContactsFragment"
+            android:label="Contatos" />
         <fragment
             android:id="@+id/nav_profile"
             android:name="com.thorapps.repaircars.profile.ProfileFragment"

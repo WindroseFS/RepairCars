@@ -46,6 +46,8 @@ class ChatActivity : AppCompatActivity() {
         contactId = intent.getLongExtra("CONTACT_ID", 0)
         val contactName = intent.getStringExtra("CONTACT_NAME") ?: "Contato"
 
+        // Configurar a Toolbar como ActionBar
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = contactName
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -75,7 +77,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         binding.messagesRecyclerView.layoutManager = LinearLayoutManager(this)
-        refreshMessages()
+        // Removida a chamada duplicada para refreshMessages()
     }
 
     private fun refreshMessages() {
@@ -128,10 +130,8 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun setupLocationButton() {
-        binding.btnLocation?.setOnClickListener {
+        binding.btnLocation.setOnClickListener {
             getLastKnownLocationAndSend()
-        } ?: run {
-            Log.d(TAG, "Botão de localização não encontrado no layout")
         }
     }
 
