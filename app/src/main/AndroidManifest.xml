@@ -7,6 +7,12 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +27,7 @@
 
         <!-- LoginActivity como LAUNCHER -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".auth.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.RepairCars.NoActionBar">
             <intent-filter>
@@ -38,12 +44,58 @@
         <activity
             android:name=".NewChatActivity"
             android:exported="false"
-            android:theme="@style/Theme.RepairCars.NoActionBar" />
+            android:theme="@style/Theme.RepairCars.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".ChatActivity"
             android:exported="false"
+            android:theme="@style/Theme.RepairCars.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- NewsActivity -->
+        <activity
+            android:name=".NewsActivity"
+            android:exported="false"
             android:theme="@style/Theme.RepairCars.NoActionBar" />
+
+        <!-- Services -->
+        <service
+            android:name=".service.ChatService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- Broadcast Receivers -->
+        <receiver
+            android:name=".receiver.NetworkReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Providers -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- Meta-data para Firebase (se estiver usando) -->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <!-- Meta-data para notificações -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+
     </application>
 
 </manifest>

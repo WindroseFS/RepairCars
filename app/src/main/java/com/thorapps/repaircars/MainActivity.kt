@@ -23,22 +23,25 @@ class MainActivity : AppCompatActivity() {
         // Configurar a Toolbar
         setSupportActionBar(binding.toolbar)
 
-        // Configurar navegação
-        setupNavigation()
+        // Configurar navegação DEPOIS que a view estiver criada
+        binding.root.post {
+            setupNavigation()
+        }
     }
 
     private fun setupNavigation() {
         // Obter o NavController
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navController = findNavController(R.id.nav_host_fragment)
 
         // Configurar TODOS os destinos de nível superior para o Drawer
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
                 R.id.nav_dashboard,
+                R.id.nav_news,           // Adicionado
                 R.id.nav_services,
                 R.id.nav_customers,
-                R.id.nav_chats,
+                R.id.nav_chats,          // Adicionado
                 R.id.nav_contacts,
                 R.id.nav_notifications,
                 R.id.nav_settings,
@@ -55,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

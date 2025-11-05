@@ -12,27 +12,17 @@
         android:id="@+id/textContactName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Contact Name"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary" />
-
-    <TextView
-        android:id="@+id/textContactEmail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="contact@example.com"
-        android:textSize="14sp"
-        android:textColor="?android:attr/textColorSecondary"
-        android:layout_marginTop="4dp" />
+        android:text="Nome do Contato"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/textContactPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="123-456-7890"
+        android:text="Telefone"
         android:textSize="14sp"
-        android:textColor="?android:attr/textColorSecondary"
-        android:layout_marginTop="2dp" />
+        android:textColor="#666"
+        android:layout_marginTop="4dp" />
 
 </LinearLayout>

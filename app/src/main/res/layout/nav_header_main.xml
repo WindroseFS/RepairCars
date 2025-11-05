@@ -20,7 +20,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="App Version 1.0"
+        android:text="Versão do app: 1.0"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
         android:textColor="@android:color/white"
         android:textSize="14sp" />

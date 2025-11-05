@@ -18,10 +18,22 @@
         android:id="@+id/textEmptyState"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No contacts available"
+        android:text="Nenhum contato disponível"
         android:textSize="18sp"
         android:gravity="center"
         android:visibility="gone" />
+
+    <!-- Botão Flutuante para Adicionar Contato -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddContact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        android:contentDescription="Adicionar contato"
+        app:tint="@android:color/white" />
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleViewContacts"

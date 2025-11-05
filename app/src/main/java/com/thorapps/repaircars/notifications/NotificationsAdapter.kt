@@ -13,8 +13,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class NotificationsAdapter(
-    private val onNotificationClick: (Notification) -> Unit
-) : ListAdapter<Notification, NotificationsAdapter.ViewHolder>(NotificationDiffCallback) {
+    private val onNotificationClick: (AppNotification) -> Unit
+) : ListAdapter<AppNotification, NotificationsAdapter.ViewHolder>(NotificationDiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -36,16 +36,16 @@ class NotificationsAdapter(
         private val tvTime: TextView = itemView.findViewById(R.id.tvNotificationTime)
         private val dotUnread: View = itemView.findViewById(R.id.dotUnread)
 
-        fun bind(notification: Notification) {
-            tvTitle.text = notification.title
-            tvMessage.text = notification.message
-            tvTime.text = formatTime(notification.timestamp)
+        fun bind(appNotification: AppNotification) {
+            tvTitle.text = appNotification.title
+            tvMessage.text = appNotification.message
+            tvTime.text = formatTime(appNotification.timestamp)
 
             // Marcar como lido/não lido
-            dotUnread.visibility = if (notification.isRead) View.GONE else View.VISIBLE
+            dotUnread.visibility = if (appNotification.isRead) View.GONE else View.VISIBLE
 
             // Cor baseada no tipo
-            val color = when (notification.type) {
+            val color = when (appNotification.type) {
                 NotificationType.APPOINTMENT -> Color.parseColor("#2196F3")
                 NotificationType.STOCK -> Color.parseColor("#4CAF50")
                 NotificationType.PAYMENT -> Color.parseColor("#FF9800")
@@ -71,16 +71,16 @@ class NotificationsAdapter(
     }
 
     // Método para obter notificação por posição (se necessário)
-    fun getNotificationAt(position: Int): Notification {
+    fun getNotificationAt(position: Int): AppNotification {
         return getItem(position)
     }
 
     // Método para atualizar uma notificação específica
-    fun updateNotification(notification: Notification) {
+    fun updateNotification(appNotification: AppNotification) {
         val currentList = currentList.toMutableList()
-        val position = currentList.indexOfFirst { it.id == notification.id }
+        val position = currentList.indexOfFirst { it.id == appNotification.id }
         if (position != -1) {
-            currentList[position] = notification
+            currentList[position] = appNotification
             submitList(currentList)
         }
     }
@@ -91,12 +91,12 @@ class NotificationsAdapter(
         submitList(updatedList)
     }
 
-    companion object NotificationDiffCallback : DiffUtil.ItemCallback<Notification>() {
-        override fun areItemsTheSame(oldItem: Notification, newItem: Notification): Boolean {
+    companion object NotificationDiffCallback : DiffUtil.ItemCallback<AppNotification>() {
+        override fun areItemsTheSame(oldItem: AppNotification, newItem: AppNotification): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Notification, newItem: Notification): Boolean {
+        override fun areContentsTheSame(oldItem: AppNotification, newItem: AppNotification): Boolean {
             return oldItem == newItem
         }
     }

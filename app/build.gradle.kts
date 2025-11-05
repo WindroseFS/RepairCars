@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
+    id("kotlin-parcelize") // ADICIONE ESTA LINHA
 }
 
 android {
@@ -46,7 +47,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        // Data Binding temporariamente desabilitado para resolver conflito
         dataBinding = false
     }
 }

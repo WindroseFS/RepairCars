@@ -21,7 +21,7 @@
             android:id="@+id/tvWelcome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Welcome to Repair Cars"
+            android:text="Bem vindo ao Repair Cars"
             android:textSize="24sp"
             android:textStyle="bold"
             android:gravity="center"
@@ -31,7 +31,7 @@
             android:id="@+id/tvTodayAppointments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Today's Appointments: 5"
+            android:text="Atendimentos de hoje: 5"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -39,7 +39,7 @@
             android:id="@+id/tvUrgentTasks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Urgent Tasks: 2"
+            android:text="Tarefas urgentes: 2"
             android:textSize="16sp"
             android:layout_marginBottom="16dp" />
 
@@ -55,7 +55,7 @@
                 android:id="@+id/tvError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Error loading data"
+                android:text="Erro ao carregar dados"
                 android:textSize="16sp"
                 android:gravity="center"
                 android:textColor="?android:attr/textColorSecondary" />

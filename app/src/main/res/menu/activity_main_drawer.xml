@@ -1,66 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <!-- Home -->
         <item
             android:id="@+id/nav_home"
-            android:icon="@android:drawable/ic_menu_view"
-            android:title="Home" />
-
-        <!-- Dashboard -->
+            android:icon="@drawable/ic_home"
+            android:title="@string/title_home" />
         <item
             android:id="@+id/nav_dashboard"
-            android:icon="@android:drawable/ic_menu_agenda"
-            android:title="Dashboard" />
-
-        <!-- Services -->
+            android:icon="@drawable/ic_dashboard"
+            android:title="@string/title_dashboard" />
+        <item
+            android:id="@+id/nav_news"
+            android:icon="@drawable/ic_news"
+            android:title="@string/title_news" />
         <item
             android:id="@+id/nav_services"
-            android:icon="@android:drawable/ic_menu_manage"
-            android:title="Services" />
-
-        <!-- Customers -->
+            android:icon="@drawable/ic_services"
+            android:title="@string/title_services" />
         <item
             android:id="@+id/nav_customers"
-            android:icon="@android:drawable/ic_menu_my_calendar"
-            android:title="Customers" />
-
-        <!-- Chats -->
+            android:icon="@drawable/ic_customers"
+            android:title="@string/title_customers" />
         <item
             android:id="@+id/nav_chats"
-            android:icon="@android:drawable/ic_menu_chat"
-            android:title="Chats" />
-
-        <!-- Contacts -->
+            android:icon="@drawable/ic_chats"
+            android:title="@string/title_chats" />
         <item
             android:id="@+id/nav_contacts"
-            android:icon="@android:drawable/ic_menu_myplaces"
-            android:title="Contacts" />
-
-        <!-- Notifications -->
+            android:icon="@drawable/ic_contacts"
+            android:title="@string/title_contacts" />
         <item
             android:id="@+id/nav_notifications"
-            android:icon="@android:drawable/ic_popup_reminder"
-            android:title="Notifications" />
-
-        <!-- Divisor para Configurações -->
-        <item android:title="CONFIGURAÇÕES">
-            <menu>
-                <!-- Settings -->
-                <item
-                    android:id="@+id/nav_settings"
-                    android:icon="@android:drawable/ic_menu_preferences"
-                    android:title="Settings" />
-
-                <!-- Help -->
-                <item
-                    android:id="@+id/nav_help"
-                    android:icon="@android:drawable/ic_menu_help"
-                    android:title="Help" />
-            </menu>
-        </item>
+            android:icon="@drawable/ic_notifications"
+            android:title="@string/title_notifications" />
     </group>
+
+    <item android:title="Configurações">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="@string/title_settings" />
+            <item
+                android:id="@+id/nav_help"
+                android:icon="@drawable/ic_help"
+                android:title="@string/title_help" />
+        </menu>
+    </item>
+
 </menu>

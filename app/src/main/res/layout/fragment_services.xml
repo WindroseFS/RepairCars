@@ -14,12 +14,12 @@
             android:id="@+id/textServicesTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Services"
+            android:text="Serviços"
             android:textSize="24sp"
             android:textStyle="bold"
             android:gravity="center"
             android:layout_marginBottom="16dp"
-            tools:text="Our Services" />
+            tools:text="Nossos serviços" />
 
         <TextView
             android:id="@+id/textServicesDescription"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:lineSpacingExtra="8sp"
-            tools:text="Professional car repair services..." />
+            tools:text="Serviços profissionais de concerto de carros em qualquer lugar..." />
 
     </LinearLayout>
 

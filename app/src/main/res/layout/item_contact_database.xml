@@ -12,7 +12,7 @@
         android:id="@+id/tvContactName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Contact Name"
+        android:text="Nome do contato"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="?android:attr/textColorPrimary" />
@@ -21,7 +21,7 @@
         android:id="@+id/tvLastMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Last message"
+        android:text="Última mensagem"
         android:textSize="14sp"
         android:textColor="?android:attr/textColorSecondary"
         android:layout_marginTop="4dp" />

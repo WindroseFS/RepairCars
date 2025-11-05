@@ -1,6 +1,5 @@
 package com.thorapps.repaircars.notifications
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +13,7 @@ class NotificationsViewModel : androidx.lifecycle.ViewModel() {
     private val _notificationsState = MutableStateFlow<NotificationsState>(NotificationsState.Loading)
     val notificationsState: StateFlow<NotificationsState> = _notificationsState.asStateFlow()
 
-    private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
+    private val _notifications = MutableStateFlow<List<AppNotification>>(emptyList())
 
     val unreadCount = _notifications.map { notifications ->
         notifications.count { !it.isRead }
@@ -27,17 +26,17 @@ class NotificationsViewModel : androidx.lifecycle.ViewModel() {
             try {
                 delay(600)
 
-                val mockNotifications = listOf(
-                    Notification(
-                        id = 1,
+                val mockAppNotifications = listOf(
+                    AppNotification(
+                        id = AppNotification.generateId(),
                         title = "Novo agendamento",
                         message = "Cliente João agendou troca de óleo para amanhã",
                         timestamp = System.currentTimeMillis() - 1000 * 60 * 30,
                         type = NotificationType.APPOINTMENT,
                         isRead = false
                     ),
-                    Notification(
-                        id = 2,
+                    AppNotification(
+                        id = AppNotification.generateId(),
                         title = "Peça chegou",
                         message = "Pastilhas de freio para Honda Civic estão disponíveis",
                         timestamp = System.currentTimeMillis() - 1000 * 60 * 60 * 2,
@@ -46,15 +45,15 @@ class NotificationsViewModel : androidx.lifecycle.ViewModel() {
                     )
                 )
 
-                _notifications.value = mockNotifications
-                _notificationsState.value = NotificationsState.Success(mockNotifications)
+                _notifications.value = mockAppNotifications
+                _notificationsState.value = NotificationsState.Success(mockAppNotifications)
             } catch (e: Exception) {
                 _notificationsState.value = NotificationsState.Error("Erro ao carregar notificações: ${e.message}")
             }
         }
     }
 
-    fun markAsRead(notificationId: Int) {
+    fun markAsRead(notificationId: String) {
         viewModelScope.launch {
             _notifications.value = _notifications.value.map { notification ->
                 if (notification.id == notificationId) {
@@ -69,9 +68,7 @@ class NotificationsViewModel : androidx.lifecycle.ViewModel() {
 
     fun markAllAsRead() {
         viewModelScope.launch {
-            _notifications.value = _notifications.value.map { notification ->
-                notification.copy(isRead = true)
-            }
+            _notifications.value = _notifications.value.map { it.copy(isRead = true) }
             _notificationsState.value = NotificationsState.Success(_notifications.value)
         }
     }
@@ -86,18 +83,9 @@ class NotificationsViewModel : androidx.lifecycle.ViewModel() {
 
 sealed class NotificationsState {
     object Loading : NotificationsState()
-    data class Success(val notifications: List<Notification>) : NotificationsState()
+    data class Success(val appNotifications: List<AppNotification>) : NotificationsState()
     data class Error(val message: String) : NotificationsState()
 }
-
-data class Notification(
-    val id: Int,
-    val title: String,
-    val message: String,
-    val timestamp: Long,
-    val type: NotificationType,
-    val isRead: Boolean
-)
 
 enum class NotificationType {
     APPOINTMENT, STOCK, PAYMENT, SYSTEM, ALERT

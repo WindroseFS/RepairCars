@@ -12,4 +12,21 @@
     <string name="title_customers">Clientes</string>
     <string name="title_settings">Configurações</string>
     <string name="title_help">Ajuda</string>
+
+    <!-- Adicione estas strings para notificações -->
+    <string name="default_notification_channel_id">default_channel</string>
+    <string name="default_notification_channel_name">Notificações Gerais</string>
+    <string name="chat_notification_channel_id">chat_channel</string>
+    <string name="chat_notification_channel_name">Mensagens de Chat</string>
+
+    <!-- Strings para os novos botões -->
+    <string name="add_contact">Adicionar Contato</string>
+    <string name="new_chat">Nova Conversa</string>
+    <string name="message_new_chat">Nova mensagem</string>
+    <string name="loading">Carregando...</string>
+    <string name="error_loading_data">Erro ao carregar dados</string>
+
+    <!-- Strings para as novas activities -->
+    <string name="title_news">Notícias</string>
+    <string name="title_chats">Conversas</string>
 </resources>

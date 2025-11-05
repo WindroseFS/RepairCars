@@ -20,7 +20,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dashboard"
+            android:text="Painel"
             android:textSize="24sp"
             android:textStyle="bold"
             android:gravity="center"
@@ -30,7 +30,7 @@
             android:id="@+id/tvActiveRepairs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Active Repairs: 8"
+            android:text="Reparos em andamento: 8"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -38,7 +38,7 @@
             android:id="@+id/tvCompletedToday"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Completed Today: 12"
+            android:text="Concluídos hoje: 12"
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
@@ -46,7 +46,7 @@
             android:id="@+id/tvPendingRequests"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pending Requests: 5"
+            android:text="Solicitações pendentes: 5"
             android:textSize="16sp"
             android:layout_marginBottom="16dp" />
 
@@ -62,7 +62,7 @@
                 android:id="@+id/tvError"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Error loading dashboard"
+                android:text="Erro ao carregar o painel"
                 android:textSize="16sp"
                 android:gravity="center"
                 android:textColor="?android:attr/textColorSecondary" />

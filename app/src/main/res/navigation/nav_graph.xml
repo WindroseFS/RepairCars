@@ -5,67 +5,156 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/nav_home">
 
-    <!-- Home Fragment -->
+    <!-- Fragments Principais -->
     <fragment
         android:id="@+id/nav_home"
         android:name="com.thorapps.repaircars.ui.home.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home" />
 
-    <!-- Dashboard Fragment -->
-    <fragment
-        android:id="@+id/nav_dashboard"
-        android:name="com.thorapps.repaircars.dashboard.DashboardFragment"
-        android:label="Dashboard"
-        tools:layout="@layout/fragment_dashboard" />
-
-    <!-- Services Fragment -->
-    <fragment
-        android:id="@+id/nav_services"
-        android:name="com.thorapps.repaircars.ui.services.ServicesFragment"
-        android:label="Services"
-        tools:layout="@layout/fragment_services" />
-
-    <!-- Customers Fragment -->
-    <fragment
-        android:id="@+id/nav_customers"
-        android:name="com.thorapps.repaircars.ui.customers.CustomersFragment"
-        android:label="Customers"
-        tools:layout="@layout/fragment_customers" />
-
-    <!-- Chats Fragment -->
     <fragment
         android:id="@+id/nav_chats"
         android:name="com.thorapps.repaircars.chats.ChatsFragment"
-        android:label="Chats"
+        android:label="Conversas"
         tools:layout="@layout/fragment_chats" />
 
-    <!-- Contacts Fragment -->
     <fragment
         android:id="@+id/nav_contacts"
         android:name="com.thorapps.repaircars.contacts.ContactsFragment"
-        android:label="Contacts"
+        android:label="Contatos"
         tools:layout="@layout/fragment_contacts" />
 
-    <!-- Notifications Fragment -->
     <fragment
-        android:id="@+id/nav_notifications"
-        android:name="com.thorapps.repaircars.notifications.NotificationsFragment"
-        android:label="Notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/nav_profile"
+        android:name="com.thorapps.repaircars.profile.ProfileFragment"
+        android:label="Perfil"
+        tools:layout="@layout/fragment_profile" />
 
-    <!-- Settings Fragment -->
     <fragment
         android:id="@+id/nav_settings"
         android:name="com.thorapps.repaircars.settings.SettingsFragment"
-        android:label="Settings"
+        android:label="Configurações"
         tools:layout="@layout/fragment_settings" />
 
-    <!-- Help Fragment -->
+    <!-- Activities -->
+    <activity
+        android:id="@+id/nav_new_chat"
+        android:name="com.thorapps.repaircars.NewChatActivity"
+        android:label="Novo Chat" />
+
+    <activity
+        android:id="@+id/nav_chat"
+        android:name="com.thorapps.repaircars.ChatActivity"
+        android:label="Chat" />
+
+    <activity
+        android:id="@+id/nav_login"
+        android:name="com.thorapps.repaircars.auth.LoginActivity"
+        android:label="Login" />
+
+    <activity
+        android:id="@+id/nav_register"
+        android:name="com.thorapps.repaircars.auth.RegisterActivity"
+        android:label="Cadastro" />
+
+    <!-- Ações de Navegação entre Fragments -->
+    <action
+        android:id="@+id/action_home_to_chats"
+        app:destination="@id/nav_chats" />
+
+    <action
+        android:id="@+id/action_home_to_contacts"
+        app:destination="@id/nav_contacts" />
+
+    <action
+        android:id="@+id/action_home_to_profile"
+        app:destination="@id/nav_profile" />
+
+    <action
+        android:id="@+id/action_chats_to_contacts"
+        app:destination="@id/nav_contacts" />
+
+    <action
+        android:id="@+id/action_chats_to_chat"
+        app:destination="@id/nav_chat" />
+
+    <action
+        android:id="@+id/action_contacts_to_new_chat"
+        app:destination="@id/nav_new_chat" />
+
+    <action
+        android:id="@+id/action_contacts_to_chat"
+        app:destination="@id/nav_chat" />
+
+    <action
+        android:id="@+id/action_profile_to_settings"
+        app:destination="@id/nav_settings" />
+
+    <!-- Ações de Navegação para Activities -->
+    <action
+        android:id="@+id/action_global_to_login"
+        app:destination="@id/nav_login"
+        app:popUpTo="@id/nav_home"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/action_global_to_register"
+        app:destination="@id/nav_register" />
+
+    <action
+        android:id="@+id/action_global_to_chat"
+        app:destination="@id/nav_chat" />
+
+    <!-- Deep Links (se necessário) -->
+    <deepLink
+        android:id="@+id/deepLink_chat"
+        app:uri="repaircars://chat/{chatId}" />
+
+    <!-- Argumentos para passagem de dados -->
     <fragment
-        android:id="@+id/nav_help"
-        android:name="com.thorapps.repaircars.help.HelpFragment"
-        android:label="Help"
-        tools:layout="@layout/fragment_help" />
+        android:id="@+id/nav_chat"
+        android:name="com.thorapps.repaircars.ChatActivity"
+        android:label="Chat">
+        <argument
+            android:name="chatId"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="contactName"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="contactPhone"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="com.thorapps.repaircars.profile.ProfileFragment"
+        android:label="Perfil">
+        <argument
+            android:name="userId"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+    <!-- Navegação Aninhada (se usar bottom navigation ou drawer) -->
+    <navigation
+        android:id="@+id/nested_main_nav"
+        app:startDestination="@id/nav_home">
+        <fragment
+            android:id="@+id/nav_home"
+            android:name="com.thorapps.repaircars.ui.home.HomeFragment"
+            android:label="Home" />
+        <fragment
+            android:id="@+id/nav_chats"
+            android:name="com.thorapps.repaircars.chats.ChatsFragment"
+            android:label="Conversas" />
+        <fragment
+            android:id="@+id/nav_profile"
+            android:name="com.thorapps.repaircars.profile.ProfileFragment"
+            android:label="Perfil" />
+    </navigation>
 
 </navigation>

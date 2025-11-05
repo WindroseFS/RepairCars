@@ -6,17 +6,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.R
-import com.thorapps.repaircars.data.models.Contact
 
 class ContactsAdapter(
-    private val contacts: List<Contact>
+    private val contacts: List<Contact>,
+    private val onItemClick: (Contact) -> Unit
 ) : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
-
-    inner class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nameTextView: TextView = itemView.findViewById(R.id.textContactName)
-        val emailTextView: TextView = itemView.findViewById(R.id.textContactEmail)
-        val phoneTextView: TextView = itemView.findViewById(R.id.textContactPhone)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -25,11 +19,24 @@ class ContactsAdapter(
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
-        val contact = contacts[position]
-        holder.nameTextView.text = contact.name
-        holder.emailTextView.text = contact.email
-        holder.phoneTextView.text = contact.phone
+        holder.bind(contacts[position])
     }
 
-    override fun getItemCount(): Int = contacts.size
+    override fun getItemCount() = contacts.size
+
+    inner class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val nameTextView: TextView = itemView.findViewById(R.id.textContactName)
+        private val phoneTextView: TextView = itemView.findViewById(R.id.textContactPhone)
+
+        fun bind(contact: Contact) {
+            nameTextView.text = contact.name
+
+            // Mostrar telefone se disponível, senão mostrar "Sem telefone"
+            phoneTextView.text = contact.phone ?: "Sem telefone"
+
+            itemView.setOnClickListener {
+                onItemClick(contact)
+            }
+        }
+    }
 }

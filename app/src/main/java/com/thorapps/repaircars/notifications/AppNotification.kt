@@ -5,7 +5,7 @@ import java.util.*
 /**
  * Data class representing a notification in the app
  */
-data class Notification(
+data class AppNotification(
     val id: String,
     val title: String,
     val message: String,
@@ -20,10 +20,10 @@ data class Notification(
             return "notif_${UUID.randomUUID()}"
         }
 
-        fun createSampleNotifications(): List<Notification> {
+        fun createSampleNotifications(): List<AppNotification> {
             val currentTime = System.currentTimeMillis()
             return listOf(
-                Notification(
+                AppNotification(
                     id = generateId(),
                     title = "Nova Mensagem",
                     message = "Você recebeu uma nova mensagem no chat",
@@ -31,7 +31,7 @@ data class Notification(
                     type = NotificationType.APPOINTMENT,
                     isRead = false
                 ),
-                Notification(
+                AppNotification(
                     id = generateId(),
                     title = "Estoque Baixo",
                     message = "Peças de reposição estão com estoque baixo",
@@ -39,7 +39,7 @@ data class Notification(
                     type = NotificationType.STOCK,
                     isRead = true
                 ),
-                Notification(
+                AppNotification(
                     id = generateId(),
                     title = "Pagamento Confirmado",
                     message = "Seu pagamento foi processado com sucesso",

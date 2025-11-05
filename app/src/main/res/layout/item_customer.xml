@@ -10,7 +10,7 @@
         android:id="@+id/textCustomerName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Customer Name"
+        android:text="Nome do cliente"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -18,7 +18,7 @@
         android:id="@+id/textCarInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Car Model - Year"
+        android:text="Modelo de carro - Ano"
         android:textSize="14sp"
         android:layout_marginTop="4dp" />
 
@@ -26,7 +26,7 @@
         android:id="@+id/textLastService"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Last Service"
+        android:text="Último serviço"
         android:textSize="14sp"
         android:textColor="?android:attr/textColorSecondary"
         android:layout_marginTop="2dp" />
