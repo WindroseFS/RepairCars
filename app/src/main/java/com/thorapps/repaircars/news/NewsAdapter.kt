@@ -1,12 +1,14 @@
-package com.thorapps.repaircars
+package com.thorapps.repaircars.news
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.databinding.ItemNewsBinding
 
-class NewsAdapter(private val lista: List<News>) :
-    RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
+class NewsAdapter(
+    private val newsList: List<News>,
+    private val onItemClick: (News) -> Unit
+) : RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
     inner class NewsViewHolder(val binding: ItemNewsBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -17,11 +19,16 @@ class NewsAdapter(private val lista: List<News>) :
     }
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
-        val news = lista[position]
+        val news = newsList[position]
         holder.binding.tvTitulo.text = news.titulo
         holder.binding.tvDescricao.text = news.descricao
         holder.binding.tvData.text = news.data
+
+        // Configurar clique no item
+        holder.itemView.setOnClickListener {
+            onItemClick(news)
+        }
     }
 
-    override fun getItemCount(): Int = lista.size
+    override fun getItemCount(): Int = newsList.size
 }

@@ -5,7 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/nav_chats">
 
-    <!-- Fragments Principais -->
+    <!-- Fragments Principais (APENAS OS QUE RESTARAM) -->
     <fragment
         android:id="@+id/nav_chats"
         android:name="com.thorapps.repaircars.chats.ChatsFragment"
@@ -19,10 +19,16 @@
         tools:layout="@layout/fragment_contacts" />
 
     <fragment
-        android:id="@+id/nav_profile"
-        android:name="com.thorapps.repaircars.profile.ProfileFragment"
-        android:label="Perfil"
-        tools:layout="@layout/fragment_profile" />
+        android:id="@+id/nav_notifications"
+        android:name="com.thorapps.repaircars.notifications.NotificationsFragment"
+        android:label="Notificações"
+        tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/nav_news"
+        android:name="com.thorapps.repaircars.news.NewsActivity"
+        android:label="Notícias"
+        tools:layout="@layout/activity_news" />
 
     <fragment
         android:id="@+id/nav_settings"
@@ -30,108 +36,18 @@
         android:label="Configurações"
         tools:layout="@layout/fragment_settings" />
 
-    <!-- Activities -->
-    <activity
-        android:id="@+id/nav_new_chat"
-        android:name="com.thorapps.repaircars.NewChatActivity"
-        android:label="Novo Chat" />
+    <fragment
+        android:id="@+id/nav_help"
+        android:name="com.thorapps.repaircars.help.HelpFragment"
+        android:label="Ajuda"
+        tools:layout="@layout/fragment_help" />
 
+    <!-- Activities (se houver) -->
     <activity
         android:id="@+id/nav_chat_activity"
         android:name="com.thorapps.repaircars.ChatActivity"
-        android:label="Chat">
-        <!-- CORREÇÃO: Removido defaultValue para long ou usar 0L -->
-        <argument
-            android:name="CONTACT_ID"
-            app:argType="long" />
-        <argument
-            android:name="CONTACT_NAME"
-            app:argType="string"
-            android:defaultValue="" />
-        <argument
-            android:name="contactPhone"
-            app:argType="string"
-            android:defaultValue="" />
-    </activity>
+        android:label="Chat" />
 
-    <activity
-        android:id="@+id/nav_login"
-        android:name="com.thorapps.repaircars.auth.LoginActivity"
-        android:label="Login" />
-
-    <activity
-        android:id="@+id/nav_register"
-        android:name="com.thorapps.repaircars.auth.RegisterActivity"
-        android:label="Cadastro" />
-
-    <!-- Ações de Navegação entre Fragments -->
-    <action
-        android:id="@+id/action_chats_to_contacts"
-        app:destination="@id/nav_contacts" />
-
-    <action
-        android:id="@+id/action_chats_to_chat_activity"
-        app:destination="@id/nav_chat_activity" />
-
-    <action
-        android:id="@+id/action_contacts_to_new_chat"
-        app:destination="@id/nav_new_chat" />
-
-    <action
-        android:id="@+id/action_contacts_to_chat_activity"
-        app:destination="@id/nav_chat_activity" />
-
-    <action
-        android:id="@+id/action_profile_to_settings"
-        app:destination="@id/nav_settings" />
-
-    <!-- Ações de Navegação para Activities -->
-    <action
-        android:id="@+id/action_global_to_login"
-        app:destination="@id/nav_login"
-        app:popUpTo="@id/nav_chats"
-        app:popUpToInclusive="true" />
-
-    <action
-        android:id="@+id/action_global_to_register"
-        app:destination="@id/nav_register" />
-
-    <action
-        android:id="@+id/action_global_to_chat_activity"
-        app:destination="@id/nav_chat_activity" />
-
-    <!-- Deep Links (se necessário) -->
-    <deepLink
-        android:id="@+id/deepLink_chat"
-        app:uri="repaircars://chat/{chatId}" />
-
-    <!-- Argumentos para passagem de dados -->
-    <fragment
-        android:id="@+id/nav_profile"
-        android:name="com.thorapps.repaircars.profile.ProfileFragment"
-        android:label="Perfil">
-        <argument
-            android:name="userId"
-            app:argType="string"
-            android:defaultValue="" />
-    </fragment>
-
-    <!-- Navegação Aninhada (se usar bottom navigation ou drawer) -->
-    <navigation
-        android:id="@+id/nested_main_nav"
-        app:startDestination="@id/nav_chats">
-        <fragment
-            android:id="@+id/nav_chats"
-            android:name="com.thorapps.repaircars.chats.ChatsFragment"
-            android:label="Conversas" />
-        <fragment
-            android:id="@+id/nav_contacts"
-            android:name="com.thorapps.repaircars.contacts.ContactsFragment"
-            android:label="Contatos" />
-        <fragment
-            android:id="@+id/nav_profile"
-            android:name="com.thorapps.repaircars.profile.ProfileFragment"
-            android:label="Perfil" />
-    </navigation>
+    <!-- Resto do navigation graph... -->
 
 </navigation>

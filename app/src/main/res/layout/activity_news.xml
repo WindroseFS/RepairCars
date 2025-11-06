@@ -1,16 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5"
-    android:padding="8dp">
+    android:background="@color/light_gray"
+    tools:context="./news/NewsActivity">
 
+    <!-- Toolbar COM ID CORRETO -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:titleTextColor="@android:color/white"
+        app:title="Notícias de Automobilismo" />
+
+    <!-- RecyclerView para as notícias -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerNews"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="4dp"
+        android:padding="8dp"
         android:clipToPadding="false" />
+
+    <!-- Estado vazio -->
+    <TextView
+        android:id="@+id/textEmptyState"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Nenhuma notícia disponível"
+        android:textSize="16sp"
+        android:textColor="@color/gray"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone" />
+
 </LinearLayout>

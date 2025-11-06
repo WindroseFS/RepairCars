@@ -36,12 +36,9 @@ class MainActivity : AppCompatActivity() {
         // Configurar TODOS os destinos de nível superior para o Drawer
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home,
-                R.id.nav_dashboard,
-                R.id.nav_news,           // Adicionado
-                R.id.nav_services,
-                R.id.nav_customers,
-                R.id.nav_chats,          // Adicionado
+
+                R.id.nav_chats,
+                R.id.nav_news,
                 R.id.nav_contacts,
                 R.id.nav_notifications,
                 R.id.nav_settings,

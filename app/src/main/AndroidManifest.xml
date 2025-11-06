@@ -53,9 +53,15 @@
             android:theme="@style/Theme.RepairCars.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- NewsActivity -->
+        <!-- NewsActivity - ADICIONADA -->
         <activity
-            android:name=".NewsActivity"
+            android:name=".news.NewsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.RepairCars.NoActionBar" />
+
+        <!-- RegisterActivity - ADICIONADA -->
+        <activity
+            android:name=".auth.RegisterActivity"
             android:exported="false"
             android:theme="@style/Theme.RepairCars.NoActionBar" />
 

@@ -1,15 +1,13 @@
-package com.thorapps.repaircars
+package com.thorapps.repaircars.news
 
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.thorapps.repaircars.news.NewsAdapter
 import com.thorapps.repaircars.databinding.ActivityNewsBinding
-
-data class News(
-    val titulo: String,
-    val descricao: String,
-    val data: String
-)
 
 class NewsActivity : AppCompatActivity() {
 
@@ -20,19 +18,49 @@ class NewsActivity : AppCompatActivity() {
         binding = ActivityNewsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Configurar a Toolbar
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Notícias de Automobilismo"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        setupRecyclerView()
+        setupBackPressedHandler()
+    }
+
+    private fun setupRecyclerView() {
         val noticias = gerarNoticiasExemplo()
 
-        val adapter = NewsAdapter(noticias)
-        binding.recyclerNews.layoutManager = LinearLayoutManager(this)
-        binding.recyclerNews.adapter = adapter
+        if (noticias.isEmpty()) {
+            binding.textEmptyState.visibility = View.VISIBLE
+            binding.recyclerNews.visibility = View.GONE
+        } else {
+            binding.textEmptyState.visibility = View.GONE
+            binding.recyclerNews.visibility = View.VISIBLE
+
+            val adapter = NewsAdapter(noticias) { news ->
+                onNewsItemClicked(news)
+            }
+            binding.recyclerNews.layoutManager = LinearLayoutManager(this)
+            binding.recyclerNews.adapter = adapter
+        }
+    }
+
+    private fun setupBackPressedHandler() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
     }
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressedDispatcher.onBackPressed()
         return true
+    }
+
+    private fun onNewsItemClicked(news: News) {
+        Toast.makeText(this, "Clicou em: ${news.titulo}", Toast.LENGTH_SHORT).show()
+        // Aqui você pode abrir uma tela de detalhes da notícia se quiser
     }
 
     private fun gerarNoticiasExemplo(): List<News> {
