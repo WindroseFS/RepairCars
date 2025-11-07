@@ -1,4 +1,4 @@
-package com.thorapps.repaircars.chats
+package com.thorapps.repaircars.chat
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

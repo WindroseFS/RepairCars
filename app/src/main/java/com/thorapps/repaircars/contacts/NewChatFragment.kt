@@ -1,46 +1,43 @@
-package com.thorapps.repaircars
+package com.thorapps.repaircars.contacts
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
-import com.thorapps.repaircars.contacts.Contact
-import com.thorapps.repaircars.databinding.ActivityNewChatBinding
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.thorapps.repaircars.databinding.FragmentNewChatBinding
 
-class NewChatActivity : AppCompatActivity() {
+class NewChatFragment : Fragment() {
 
-    private lateinit var binding: ActivityNewChatBinding
+    private var _binding: FragmentNewChatBinding? = null
+    private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityNewChatBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setupViews()
-        setupBackPressedHandler()
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentNewChatBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    private fun setupBackPressedHandler() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-            }
-        })
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupViews()
     }
 
     private fun setupViews() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
+
         binding.btnSaveContact.setOnClickListener {
             saveContact()
         }
 
         binding.btnCancel.setOnClickListener {
-            finish()
-        }
-
-        binding.btnBackToList.setOnClickListener {
-            finish()
+            findNavController().navigateUp()
         }
     }
 
@@ -53,7 +50,6 @@ class NewChatActivity : AppCompatActivity() {
             return
         }
 
-        // Criar o contato
         val newContact = Contact(
             id = System.currentTimeMillis().toString(),
             name = name,
@@ -61,12 +57,11 @@ class NewChatActivity : AppCompatActivity() {
             email = email
         )
 
-        // Retornar o contato para o ContactsFragment
-        val resultIntent = Intent().apply {
-            putExtra("NEW_CONTACT", newContact)
-        }
-        setResult(Activity.RESULT_OK, resultIntent)
-        finish()
+        // SAFE ARGS - Navegando com argumentos
+        val action = NewChatFragmentDirections.actionNewChatFragmentToContactsFragment(
+            newContact = newContact
+        )
+        findNavController().navigate(action)
 
         showSuccess("Contato adicionado com sucesso!")
     }
@@ -74,7 +69,6 @@ class NewChatActivity : AppCompatActivity() {
     private fun validateInputs(name: String, phone: String): Boolean {
         var isValid = true
 
-        // Validar nome
         if (name.isEmpty()) {
             binding.etContactName.error = "Digite o nome do contato"
             isValid = false
@@ -82,7 +76,6 @@ class NewChatActivity : AppCompatActivity() {
             binding.etContactName.error = null
         }
 
-        // Validar telefone
         if (phone.isEmpty()) {
             binding.etContactPhone.error = "Digite o telefone do contato"
             isValid = false
@@ -94,6 +87,11 @@ class NewChatActivity : AppCompatActivity() {
     }
 
     private fun showSuccess(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -1,128 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".chats.ChatsFragment">
+    android:orientation="vertical"
+    android:background="@color/background">
 
-    <LinearLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/light_gray">
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:title="Conversas" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Conversas"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:padding="16dp"
-            android:background="@color/white"
-            android:elevation="4dp" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp"
+        tools:listitem="@layout/item_chat" />
 
-        <!-- Card da Última Conversa -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardLastChat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?android:attr/selectableItemBackground"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <!-- Ícone de pessoa -->
-                <ImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/ic_person"
-                    android:contentDescription="Avatar"
-                    android:layout_marginEnd="16dp"
-                    android:background="@color/gray"
-                    android:padding="12dp"
-                    android:clipToOutline="true" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/textChatName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Nome do Contato"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/textLastMessage"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Última mensagem..."
-                        android:textSize="14sp"
-                        android:textColor="@color/gray"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
-
-                    <TextView
-                        android:id="@+id/textTimestamp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="12:30"
-                        android:textSize="12sp"
-                        android:textColor="@color/gray"
-                        android:layout_marginTop="4dp" />
-                </LinearLayout>
-
-                <!-- Ícone de seta -->
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_arrow_forward"
-                    android:contentDescription="Abrir conversa"
-                    android:tint="@color/gray" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycleViewChats"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/textEmptyState"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="Nenhuma conversa iniciada\nToque no botão + para começar"
-            android:textSize="16sp"
-            android:textColor="@color/gray"
-            android:gravity="center"
-            android:padding="32dp" />
-
-    </LinearLayout>
-
-    <!-- Botão Flutuante para Nova Conversa - POSICIONADO CORRETAMENTE -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabNewChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_chat"
-        android:contentDescription="Nova conversa"
-        app:tint="@android:color/white" />
+        android:src="@drawable/ic_add"
+        app:tint="@color/white" />
 
-</FrameLayout>
+</LinearLayout>

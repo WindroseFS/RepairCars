@@ -1,4 +1,4 @@
-package com.thorapps.repaircars.chats
+package com.thorapps.repaircars.chat
 
 import android.view.LayoutInflater
 import android.view.View

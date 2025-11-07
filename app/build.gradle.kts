@@ -1,9 +1,9 @@
-// app/build.gradle.kts - VERSÃO COMPATÍVEL
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
-    id("kotlin-parcelize") // ADICIONE ESTA LINHA
+    id("kotlin-parcelize")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -98,13 +98,13 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 }
 
-// Estratégia de resolução para forçar versões compatíveis
 configurations.all {
     resolutionStrategy {
         eachDependency {
             when (requested.group) {
                 "org.jetbrains.kotlin" -> useVersion("1.9.22")
                 "androidx.databinding" -> useVersion("8.2.2")
+                "androidx.navigation" -> useVersion("2.7.7")
             }
         }
     }

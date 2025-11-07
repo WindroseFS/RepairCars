@@ -27,7 +27,7 @@
 
         <!-- LoginActivity como LAUNCHER -->
         <activity
-            android:name=".auth.LoginActivity"
+            android:name=".auth.LoginFragment"
             android:exported="true"
             android:theme="@style/Theme.RepairCars.NoActionBar">
             <intent-filter>
@@ -42,26 +42,26 @@
             android:theme="@style/Theme.RepairCars.NoActionBar" />
 
         <activity
-            android:name=".NewChatActivity"
+            android:name=".chat.NewChatFragment"
             android:exported="false"
             android:theme="@style/Theme.RepairCars.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".ChatActivity"
+            android:name=".ChatFragment"
             android:exported="false"
             android:theme="@style/Theme.RepairCars.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
 
         <!-- NewsActivity - ADICIONADA -->
         <activity
-            android:name=".news.NewsActivity"
+            android:name=".news.NewsFragment"
             android:exported="false"
             android:theme="@style/Theme.RepairCars.NoActionBar" />
 
         <!-- RegisterActivity - ADICIONADA -->
         <activity
-            android:name=".auth.RegisterActivity"
+            android:name=".auth.RegisterFragment"
             android:exported="false"
             android:theme="@style/Theme.RepairCars.NoActionBar" />
 

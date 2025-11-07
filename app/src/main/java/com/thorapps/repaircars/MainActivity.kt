@@ -20,25 +20,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Configurar a Toolbar
         setSupportActionBar(binding.toolbar)
-
-        // Configurar navegação DEPOIS que a view estiver criada
-        binding.root.post {
-            setupNavigation()
-        }
+        setupNavigation()
     }
 
     private fun setupNavigation() {
-        // Obter o NavController
         val navController = findNavController(R.id.nav_host_fragment)
 
-        // Configurar TODOS os destinos de nível superior para o Drawer
         appBarConfiguration = AppBarConfiguration(
             setOf(
-
                 R.id.nav_chats,
-                R.id.nav_news,
                 R.id.nav_contacts,
                 R.id.nav_notifications,
                 R.id.nav_settings,
@@ -47,10 +38,7 @@ class MainActivity : AppCompatActivity() {
             binding.drawerLayout
         )
 
-        // Configurar ActionBar com NavController
         setupActionBarWithNavController(navController, appBarConfiguration)
-
-        // Configurar NavigationView com NavController
         binding.navView.setupWithNavController(navController)
     }
 

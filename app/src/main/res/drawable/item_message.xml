@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <!-- Layout para mensagens recebidas -->
+    <LinearLayout
+        android:id="@+id/messageLayoutReceived"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/message_background"
+        android:paddingStart="12dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp"
+        android:layout_gravity="start"
+        tools:layout_gravity="start">
+
+        <TextView
+            android:id="@+id/tvMessageTextReceived"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Esta é uma mensagem de exemplo"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:maxWidth="280dp" />
+
+    </LinearLayout>
+
+    <!-- Layout para mensagens enviadas -->
+    <LinearLayout
+        android:id="@+id/messageLayoutSent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/message_background_me"
+        android:paddingStart="12dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp"
+        android:layout_gravity="end"
+        android:visibility="gone"
+        tools:layout_gravity="end">
+
+        <TextView
+            android:id="@+id/tvMessageTextSent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Esta é uma mensagem enviada por mim"
+            android:textColor="@color/message_text_me"
+            android:textSize="16sp"
+            android:maxWidth="280dp" />
+
+    </LinearLayout>
+
+    <!-- Timestamp para mensagens recebidas -->
+    <TextView
+        android:id="@+id/tvMessageTimeReceived"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10:30"
+        android:textSize="12sp"
+        android:textColor="@color/gray"
+        android:layout_gravity="start"
+        android:layout_marginTop="4dp"
+        tools:layout_gravity="start" />
+
+    <!-- Timestamp para mensagens enviadas -->
+    <TextView
+        android:id="@+id/tvMessageTimeSent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10:30"
+        android:textSize="12sp"
+        android:textColor="@color/gray"
+        android:layout_gravity="end"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        tools:layout_gravity="end" />
+
+</LinearLayout>

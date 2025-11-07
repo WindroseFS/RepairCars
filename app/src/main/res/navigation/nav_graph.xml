@@ -5,30 +5,94 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/nav_chats">
 
-    <!-- Fragments Principais (APENAS OS QUE RESTARAM) -->
+    <!-- Fragment de Chat -->
     <fragment
-        android:id="@+id/nav_chats"
-        android:name="com.thorapps.repaircars.chats.ChatsFragment"
-        android:label="Conversas"
-        tools:layout="@layout/fragment_chats" />
+        android:id="@+id/nav_chat"
+        android:name="com.thorapps.repaircars.chat.ChatFragment"
+        android:label="Chat"
+        tools:layout="@layout/fragment_chat">
 
+        <argument
+            android:name="contactId"
+            app:argType="long" />
+
+        <argument
+            android:name="contactName"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_chatFragment_to_chatsFragment"
+            app:destination="@id/nav_chats"
+            app:popUpTo="@id/nav_chats"
+            app:popUpToInclusive="true" />
+
+    </fragment>
+
+    <!-- Fragment de Novo Chat/Contato -->
+    <fragment
+        android:id="@+id/nav_new_chat"
+        android:name="com.thorapps.repaircars.contacts.NewChatFragment"
+        android:label="Novo Contato"
+        tools:layout="@layout/fragment_new_chat">
+
+        <action
+            android:id="@+id/action_newChatFragment_to_contactsFragment"
+            app:destination="@id/nav_contacts"
+            app:popUpTo="@id/nav_contacts" />
+
+    </fragment>
+
+    <!-- Fragment de Contatos -->
     <fragment
         android:id="@+id/nav_contacts"
         android:name="com.thorapps.repaircars.contacts.ContactsFragment"
         android:label="Contatos"
-        tools:layout="@layout/fragment_contacts" />
+        tools:layout="@layout/fragment_contacts">
 
+        <!-- CORREÇÃO: Adicionar app:nullable="true" -->
+        <argument
+            android:name="newContact"
+            app:argType="com.thorapps.repaircars.contacts.Contact"
+            app:nullable="true" />
+
+        <action
+            android:id="@+id/action_contactsFragment_to_newChatFragment"
+            app:destination="@id/nav_new_chat" />
+
+        <action
+            android:id="@+id/action_contactsFragment_to_chatFragment"
+            app:destination="@id/nav_chat" />
+
+        <action
+            android:id="@+id/action_contactsFragment_to_chatsFragment"
+            app:destination="@id/nav_chats"
+            app:popUpTo="@id/nav_chats" />
+
+    </fragment>
+
+    <!-- Fragment de Conversas -->
+    <fragment
+        android:id="@+id/nav_chats"
+        android:name="com.thorapps.repaircars.chat.ChatsFragment"
+        android:label="Conversas"
+        tools:layout="@layout/fragment_chats">
+
+        <action
+            android:id="@+id/action_chatsFragment_to_chatFragment"
+            app:destination="@id/nav_chat" />
+
+        <action
+            android:id="@+id/action_chatsFragment_to_contactsFragment"
+            app:destination="@id/nav_contacts" />
+
+    </fragment>
+
+    <!-- Outros destinos -->
     <fragment
         android:id="@+id/nav_notifications"
         android:name="com.thorapps.repaircars.notifications.NotificationsFragment"
         android:label="Notificações"
         tools:layout="@layout/fragment_notifications" />
-
-    <fragment
-        android:id="@+id/nav_news"
-        android:name="com.thorapps.repaircars.news.NewsActivity"
-        android:label="Notícias"
-        tools:layout="@layout/activity_news" />
 
     <fragment
         android:id="@+id/nav_settings"
@@ -41,13 +105,5 @@
         android:name="com.thorapps.repaircars.help.HelpFragment"
         android:label="Ajuda"
         tools:layout="@layout/fragment_help" />
-
-    <!-- Activities (se houver) -->
-    <activity
-        android:id="@+id/nav_chat_activity"
-        android:name="com.thorapps.repaircars.ChatActivity"
-        android:label="Chat" />
-
-    <!-- Resto do navigation graph... -->
 
 </navigation>

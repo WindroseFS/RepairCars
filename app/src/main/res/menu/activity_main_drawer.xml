@@ -1,36 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_chats"
-            android:icon="@drawable/ic_chats"
-            android:title="@string/title_chats" />
-        <item
-            android:id="@+id/nav_news"
-            android:icon="@drawable/ic_news"
-            android:title="@string/title_news" />
+            android:icon="@drawable/ic_chat"
+            android:title="Conversas" />
         <item
             android:id="@+id/nav_contacts"
             android:icon="@drawable/ic_contacts"
-            android:title="@string/title_contacts" />
+            android:title="Contatos" />
         <item
             android:id="@+id/nav_notifications"
             android:icon="@drawable/ic_notifications"
-            android:title="@string/title_notifications" />
+            android:title="Notificações" />
+        <item
+            android:id="@+id/nav_news"
+            android:icon="@drawable/ic_news"
+            android:title="Notícias" />
     </group>
 
-    <item android:title="Configurações">
-        <menu>
-            <item
-                android:id="@+id/nav_settings"
-                android:icon="@drawable/ic_settings"
-                android:title="@string/title_settings" />
-            <item
-                android:id="@+id/nav_help"
-                android:icon="@drawable/ic_help"
-                android:title="@string/title_help" />
-        </menu>
-    </item>
-
+    <group android:id="@+id/group_settings">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="Configurações" />
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/ic_help"
+            android:title="Ajuda" />
+    </group>
 </menu>

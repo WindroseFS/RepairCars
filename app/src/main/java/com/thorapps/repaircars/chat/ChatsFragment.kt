@@ -1,56 +1,42 @@
-package com.thorapps.repaircars.contacts
+package com.thorapps.repaircars.chat
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.thorapps.repaircars.databinding.FragmentContactsBinding
+import com.thorapps.repaircars.databinding.FragmentChatsBinding
 import com.thorapps.repaircars.R
 
-class ContactsFragment : Fragment() {
+class ChatsFragment : Fragment() {
 
-    private var _binding: FragmentContactsBinding? = null
+    private var _binding: FragmentChatsBinding? = null
     private val binding get() = _binding!!
-
-    // SAFE ARGS - Recebendo argumentos
-    private val args: ContactsFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentContactsBinding.inflate(inflater, container, false)
+        _binding = FragmentChatsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Verificar se recebemos um novo contato via Safe Args
-        args.newContact?.let { newContact ->
-            Log.d("ContactsFragment", "Novo contato recebido: ${newContact.name}")
-            Toast.makeText(requireContext(), "Contato ${newContact.name} adicionado!", Toast.LENGTH_SHORT).show()
-            // TODO: Adicionar à lista de contatos
-        }
-
         setupRecyclerView()
         setupViews()
     }
 
     private fun setupRecyclerView() {
-        binding.contactsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.chatsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         // Adapter temporário para demonstração
         val adapter = object : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_contact, parent, false)
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.item_chat, parent, false)
                 return object : RecyclerView.ViewHolder(view) {}
             }
 
@@ -59,8 +45,8 @@ class ContactsFragment : Fragment() {
                     val contactId = (position + 1).toLong()
                     val contactName = "Contato ${position + 1}"
 
-                    // SAFE ARGS - Navegando com argumentos para o Chat
-                    val action = ContactsFragmentDirections.actionContactsFragmentToChatFragment(
+                    // SAFE ARGS - Navegando com argumentos
+                    val action = ChatsFragmentDirections.actionChatsFragmentToChatFragment(
                         contactId = contactId,
                         contactName = contactName
                     )
@@ -71,17 +57,17 @@ class ContactsFragment : Fragment() {
             override fun getItemCount(): Int = 5 // 5 itens de exemplo
         }
 
-        binding.contactsRecyclerView.adapter = adapter
+        binding.chatsRecyclerView.adapter = adapter
     }
 
     private fun setupViews() {
         binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            // Abrir drawer navigation se necessário
         }
 
-        binding.fabAddContact.setOnClickListener {
-            // SAFE ARGS - Navegando para novo contato
-            val action = ContactsFragmentDirections.actionContactsFragmentToNewChatFragment()
+        binding.fabNewChat.setOnClickListener {
+            // Navegar para contatos para criar novo chat
+            val action = ChatsFragmentDirections.actionChatsFragmentToContactsFragment()
             findNavController().navigate(action)
         }
     }
