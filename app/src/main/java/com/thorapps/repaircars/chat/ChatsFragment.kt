@@ -45,7 +45,7 @@ class ChatsFragment : Fragment() {
                     val contactId = (position + 1).toLong()
                     val contactName = "Contato ${position + 1}"
 
-                    // SAFE ARGS - Navegando com argumentos
+                    // Navegação CORRETA - sem newContact
                     val action = ChatsFragmentDirections.actionChatsFragmentToChatFragment(
                         contactId = contactId,
                         contactName = contactName
@@ -62,13 +62,13 @@ class ChatsFragment : Fragment() {
 
     private fun setupViews() {
         binding.toolbar.setNavigationOnClickListener {
-            // Abrir drawer navigation se necessário
+            // Abrir drawer navigation
+            (requireActivity() as? com.thorapps.repaircars.MainActivity)?.openDrawer()
         }
 
         binding.fabNewChat.setOnClickListener {
             // Navegar para contatos para criar novo chat
-            val action = ChatsFragmentDirections.actionChatsFragmentToContactsFragment()
-            findNavController().navigate(action)
+            findNavController().navigate(R.id.nav_contacts)
         }
     }
 

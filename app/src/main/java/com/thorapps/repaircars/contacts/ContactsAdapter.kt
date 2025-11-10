@@ -25,14 +25,10 @@ class ContactsAdapter(
     override fun getItemCount() = contacts.size
 
     inner class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val nameTextView: TextView = itemView.findViewById(R.id.textContactName)
-        private val phoneTextView: TextView = itemView.findViewById(R.id.textContactPhone)
-
         fun bind(contact: Contact) {
-            nameTextView.text = contact.name
-
-            // Mostrar telefone se disponível, senão mostrar "Sem telefone"
-            phoneTextView.text = contact.phone ?: "Sem telefone"
+            // Use findViewById com os IDs corretos do seu item_contact.xml
+            itemView.findViewById<TextView>(R.id.text_contact_name)?.text = contact.name
+            itemView.findViewById<TextView>(R.id.text_contact_phone)?.text = contact.phone
 
             itemView.setOnClickListener {
                 onItemClick(contact)

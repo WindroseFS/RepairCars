@@ -1,33 +1,44 @@
 package com.thorapps.repaircars.news
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.thorapps.repaircars.databinding.ActivityNewsBinding
+import com.thorapps.repaircars.databinding.FragmentNewsBinding
 
-class NewsFragment : AppCompatActivity() {
+class NewsFragment : Fragment() {
 
-    private lateinit var binding: ActivityNewsBinding
+    private var _binding: FragmentNewsBinding? = null
+    private val binding get() = _binding!!
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityNewsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentNewsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupToolbar()
         setupRecyclerView()
-        setupBackPressedHandler()
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.apply {
-            title = "Notícias de Automobilismo"
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowHomeEnabled(true)
+        // Em fragments, você pode usar requireActivity() para acessar a Activity
+        (requireActivity() as? androidx.appcompat.app.AppCompatActivity)?.apply {
+            setSupportActionBar(binding.toolbar)
+            supportActionBar?.apply {
+                title = "Notícias de Automobilismo"
+                setDisplayHomeAsUpEnabled(true)
+                setDisplayShowHomeEnabled(true)
+            }
         }
     }
 
@@ -35,11 +46,11 @@ class NewsFragment : AppCompatActivity() {
         val noticias = gerarNoticiasExemplo()
 
         binding.recyclerNews.apply {
-            layoutManager = LinearLayoutManager(this@NewsFragment)
+            layoutManager = LinearLayoutManager(requireContext())
 
             addItemDecoration(
                 DividerItemDecoration(
-                    this@NewsFragment,
+                    requireContext(),
                     LinearLayoutManager.VERTICAL
                 )
             )
@@ -50,30 +61,17 @@ class NewsFragment : AppCompatActivity() {
         }
 
         if (noticias.isEmpty()) {
-            binding.textEmptyState.visibility = android.view.View.VISIBLE
-            binding.recyclerNews.visibility = android.view.View.GONE
+            binding.textEmptyState.visibility = View.VISIBLE
+            binding.recyclerNews.visibility = View.GONE
         } else {
-            binding.textEmptyState.visibility = android.view.View.GONE
-            binding.recyclerNews.visibility = android.view.View.VISIBLE
+            binding.textEmptyState.visibility = View.GONE
+            binding.recyclerNews.visibility = View.VISIBLE
         }
-    }
-
-    private fun setupBackPressedHandler() {
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-            }
-        })
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        finish()
-        return true
     }
 
     private fun onNewsItemClicked(news: News) {
         Toast.makeText(
-            this,
+            requireContext(),
             "Abrindo: ${news.titulo}",
             Toast.LENGTH_SHORT
         ).show()
@@ -107,5 +105,10 @@ class NewsFragment : AppCompatActivity() {
                 "03/10/2025"
             )
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -42,6 +42,11 @@ class MainActivity : AppCompatActivity() {
         binding.navView.setupWithNavController(navController)
     }
 
+    // ADICIONE ESTE MÉTODO
+    fun openDrawer() {
+        binding.drawerLayout.openDrawer(binding.navView)
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()

@@ -12,22 +12,26 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     companion object {
         private const val DATABASE_NAME = "repaircars.db"
-        private const val DATABASE_VERSION = 2
+        private const val DATABASE_VERSION = 3
 
         const val TABLE_CONTACTS = "contacts"
         const val TABLE_MESSAGES = "messages"
+        const val TABLE_MESSAGE_OPTIONS = "message_options"
 
         private const val TAG = "DatabaseHelper"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
         try {
+            // Tabela de contatos
             db.execSQL(
                 "CREATE TABLE $TABLE_CONTACTS(" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "name TEXT," +
                         "email TEXT)"
             )
+
+            // Tabela de mensagens
             db.execSQL(
                 "CREATE TABLE $TABLE_MESSAGES(" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -36,8 +40,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "sender TEXT," +
                         "timestamp INTEGER," +
                         "latitude REAL," +
-                        "longitude REAL)"
+                        "longitude REAL," +
+                        "has_options INTEGER DEFAULT 0)"
             )
+
+            // Tabela para opções de mensagem
+            db.execSQL(
+                "CREATE TABLE $TABLE_MESSAGE_OPTIONS(" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "messageId INTEGER," +
+                        "option_text TEXT," +
+                        "FOREIGN KEY(messageId) REFERENCES $TABLE_MESSAGES(id) ON DELETE CASCADE)"
+            )
+
             Log.d(TAG, "Banco de dados criado com sucesso")
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao criar banco de dados: ${e.message}")
@@ -46,15 +61,31 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         try {
-            if (oldVersion < 2) {
-                db.execSQL("ALTER TABLE $TABLE_MESSAGES ADD COLUMN latitude REAL")
-                db.execSQL("ALTER TABLE $TABLE_MESSAGES ADD COLUMN longitude REAL")
-                Log.d(TAG, "Banco de dados atualizado da versão $oldVersion para $newVersion")
-            } else {
-                db.execSQL("DROP TABLE IF EXISTS $TABLE_CONTACTS")
-                db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGES")
-                onCreate(db)
-                Log.d(TAG, "Banco de dados recriado na versão $newVersion")
+            when (oldVersion) {
+                1 -> {
+                    db.execSQL("ALTER TABLE $TABLE_MESSAGES ADD COLUMN latitude REAL")
+                    db.execSQL("ALTER TABLE $TABLE_MESSAGES ADD COLUMN longitude REAL")
+                    // Continua para a versão 3
+                    oldVersion++
+                }
+                2 -> {
+                    db.execSQL("ALTER TABLE $TABLE_MESSAGES ADD COLUMN has_options INTEGER DEFAULT 0")
+                    db.execSQL(
+                        "CREATE TABLE $TABLE_MESSAGE_OPTIONS(" +
+                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                "messageId INTEGER," +
+                                "option_text TEXT," +
+                                "FOREIGN KEY(messageId) REFERENCES $TABLE_MESSAGES(id) ON DELETE CASCADE)"
+                    )
+                    Log.d(TAG, "Banco de dados atualizado da versão 2 para 3")
+                }
+                else -> {
+                    db.execSQL("DROP TABLE IF EXISTS $TABLE_CONTACTS")
+                    db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGES")
+                    db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGE_OPTIONS")
+                    onCreate(db)
+                    Log.d(TAG, "Banco de dados recriado na versão $newVersion")
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao atualizar banco de dados: ${e.message}")
@@ -113,7 +144,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             val messages = mutableListOf<Message>()
             try {
                 readableDatabase.rawQuery(
-                    "SELECT id, contactId, text, sender, timestamp, latitude, longitude FROM $TABLE_MESSAGES WHERE contactId = ? ORDER BY timestamp ASC",
+                    "SELECT id, contactId, text, sender, timestamp, latitude, longitude, has_options FROM $TABLE_MESSAGES WHERE contactId = ? ORDER BY timestamp ASC",
                     arrayOf(contactId.toString())
                 ).use { cursor ->
                     while (cursor.moveToNext()) {
@@ -125,7 +156,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                                 sender = cursor.getString(3),
                                 timestamp = cursor.getLong(4),
                                 latitude = if (!cursor.isNull(5)) cursor.getDouble(5) else null,
-                                longitude = if (!cursor.isNull(6)) cursor.getDouble(6) else null
+                                longitude = if (!cursor.isNull(6)) cursor.getDouble(6) else null,
+                                hasOptions = cursor.getInt(7) == 1
                             )
                         )
                     }
@@ -144,6 +176,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     put("text", text)
                     put("sender", if (isSentByMe) "me" else "other")
                     put("timestamp", System.currentTimeMillis())
+                    put("has_options", 0)
                     if (lat != null) put("latitude", lat)
                     if (lng != null) put("longitude", lng)
                 }
@@ -155,6 +188,108 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             } catch (e: Exception) {
                 Log.e(TAG, "Erro ao adicionar mensagem: ${e.message}")
                 -1L
+            }
+        }
+
+    suspend fun addMessageWithOptions(
+        contactId: Long,
+        text: String,
+        isSentByMe: Boolean,
+        options: List<String>,
+        lat: Double? = null,
+        lng: Double? = null
+    ): Long = withContext(Dispatchers.IO) {
+        var messageId = -1L
+        try {
+            writableDatabase.beginTransaction()
+
+            val values = ContentValues().apply {
+                put("contactId", contactId)
+                put("text", text)
+                put("sender", if (isSentByMe) "me" else "other")
+                put("timestamp", System.currentTimeMillis())
+                put("has_options", if (options.isNotEmpty()) 1 else 0)
+                if (lat != null) put("latitude", lat)
+                if (lng != null) put("longitude", lng)
+            }
+
+            messageId = writableDatabase.insert(TABLE_MESSAGES, null, values)
+
+            if (messageId != -1L && options.isNotEmpty()) {
+                for (option in options) {
+                    val optionValues = ContentValues().apply {
+                        put("messageId", messageId)
+                        put("option_text", option)
+                    }
+                    writableDatabase.insert(TABLE_MESSAGE_OPTIONS, null, optionValues)
+                }
+            }
+
+            writableDatabase.setTransactionSuccessful()
+            Log.d(TAG, "Mensagem com opções adicionada com sucesso, ID: $messageId")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao adicionar mensagem com opções: ${e.message}")
+            messageId = -1L
+        } finally {
+            writableDatabase.endTransaction()
+        }
+        messageId
+    }
+
+    suspend fun getMessageOptions(messageId: Long): List<String> = withContext(Dispatchers.IO) {
+        val options = mutableListOf<String>()
+        try {
+            readableDatabase.rawQuery(
+                "SELECT option_text FROM $TABLE_MESSAGE_OPTIONS WHERE messageId = ? ORDER BY id ASC",
+                arrayOf(messageId.toString())
+            ).use { cursor ->
+                while (cursor.moveToNext()) {
+                    options.add(cursor.getString(0))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao obter opções da mensagem $messageId: ${e.message}")
+        }
+        options
+    }
+
+    suspend fun getMessageWithOptions(messageId: Long): MessageWithOptions? =
+        withContext(Dispatchers.IO) {
+            try {
+                var message: Message? = null
+
+                readableDatabase.rawQuery(
+                    "SELECT id, contactId, text, sender, timestamp, latitude, longitude, has_options FROM $TABLE_MESSAGES WHERE id = ?",
+                    arrayOf(messageId.toString())
+                ).use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        message = Message(
+                            id = cursor.getLong(0),
+                            contactId = cursor.getLong(1),
+                            text = cursor.getString(2),
+                            sender = cursor.getString(3),
+                            timestamp = cursor.getLong(4),
+                            latitude = if (!cursor.isNull(5)) cursor.getDouble(5) else null,
+                            longitude = if (!cursor.isNull(6)) cursor.getDouble(6) else null,
+                            hasOptions = cursor.getInt(7) == 1
+                        )
+                    }
+                }
+
+                message?.let { msg ->
+                    val options = if (msg.hasOptions) {
+                        getMessageOptions(messageId)
+                    } else {
+                        emptyList()
+                    }
+                    return@withContext MessageWithOptions(msg, options)
+                }
+
+                null
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao obter mensagem com opções $messageId: ${e.message}")
+                null
             }
         }
 
@@ -227,6 +362,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     put("text", messageData.text)
                     put("sender", if (messageData.isFromMe) "me" else "other")
                     put("timestamp", System.currentTimeMillis() - (Math.random() * 86400000 * 7).toLong())
+                    put("has_options", 0)
                 }
                 writableDatabase.insert(TABLE_MESSAGES, null, values)
             }
@@ -237,6 +373,18 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
     }
 }
+
+data class MessageWithOptions(
+    val message: Message,
+    val options: List<String>
+)
+
+
+data class Contact(
+    val id: Long,
+    val name: String,
+    val email: String
+)
 
 private data class MessageData(
     val contactId: Long,

@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.R
 import java.text.SimpleDateFormat
@@ -32,18 +33,28 @@ class ChatsAdapter(
         private val lastMessageTextView: TextView = itemView.findViewById(R.id.textLastMessage)
         private val timeTextView: TextView = itemView.findViewById(R.id.textTime)
         private val unreadBadge: TextView = itemView.findViewById(R.id.textUnreadCount)
+        private val avatarTextView: TextView = itemView.findViewById(R.id.textAvatar)
 
         fun bind(chat: Chat) {
             nameTextView.text = chat.contactName
             lastMessageTextView.text = chat.lastMessage
             timeTextView.text = formatTime(chat.timestamp)
 
+            // Configurar avatar com a primeira letra do nome
+            avatarTextView.text = chat.contactName.firstOrNull()?.toString() ?: "?"
+
             // Mostrar badge de mensagens não lidas
             if (chat.unreadCount > 0) {
                 unreadBadge.visibility = View.VISIBLE
-                unreadBadge.text = if (chat.unreadCount > 9) "9+" else chat.unreadCount.toString()
+                unreadBadge.text = if (chat.unreadCount > 99) "99+" else chat.unreadCount.toString()
+
+                // Destacar conversas com mensagens não lidas
+                nameTextView.setTypeface(nameTextView.typeface, android.graphics.Typeface.BOLD)
+                lastMessageTextView.setTypeface(lastMessageTextView.typeface, android.graphics.Typeface.BOLD)
             } else {
                 unreadBadge.visibility = View.GONE
+                nameTextView.setTypeface(nameTextView.typeface, android.graphics.Typeface.NORMAL)
+                lastMessageTextView.setTypeface(lastMessageTextView.typeface, android.graphics.Typeface.NORMAL)
             }
 
             itemView.setOnClickListener {
@@ -52,9 +63,13 @@ class ChatsAdapter(
         }
 
         private fun formatTime(timestamp: Long): String {
-            val date = Date(timestamp)
-            val format = SimpleDateFormat("HH:mm", Locale.getDefault())
-            return format.format(date)
+            return try {
+                val date = Date(timestamp)
+                val format = SimpleDateFormat("HH:mm", Locale.getDefault())
+                format.format(date)
+            } catch (e: Exception) {
+                "00:00"
+            }
         }
     }
 }
