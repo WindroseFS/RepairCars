@@ -4,15 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.databinding.FragmentContactsBinding
-import com.thorapps.repaircars.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ContactsFragment : Fragment() {
 
     private var _binding: FragmentContactsBinding? = null
     private val binding get() = _binding!!
+    private lateinit var contactsAdapter: ContactsAdapter
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,28 +30,53 @@ class ContactsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupClickListeners()
+        setupRecyclerView()
+        loadContacts()
     }
 
-    private fun setupClickListeners() {
-        // Exemplo: quando selecionar um contato (ajuste conforme seu layout)
-        binding.root.findViewById<View>(R.id.some_contact_view)?.setOnClickListener {
-            val contactId = 1L
-            val contactName = "Contato Exemplo"
+    private fun setupRecyclerView() {
+        recyclerView = binding.contactsRecyclerView
 
-            // Navegar para o chat
-            val action = ContactsFragmentDirections.actionContactsFragmentToChatFragment(
-                contactId = contactId,
-                contactName = contactName
+        contactsAdapter = ContactsAdapter(emptyList()) { contact ->
+            onContactClick(contact)
+        }
+
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = contactsAdapter
+        }
+    }
+
+    private fun loadContacts() {
+        CoroutineScope(Dispatchers.IO).launch {
+            // Carregar contatos do banco de dados ou fonte de dados
+            // val contacts = databaseHelper.getAllContacts()
+
+            // Exemplo com dados mock
+            val mockContacts = listOf(
+                Contact("1", "João Silva", "11999999999", "joao@email.com", "Olá, preciso de ajuda"),
+                Contact("2", "Maria Santos", "11888888888", "maria@email.com", "Orçamento por favor"),
+                Contact("3", "Carlos Oliveira", "11777777777", "carlos@email.com", "Preciso trocar o óleo"),
+                Contact("4", "Ana Costa", "11666666666", "ana@email.com", "Revisão completa")
             )
-            findNavController().navigate(action)
-        }
 
-        // Navegar para novo chat (ajuste conforme seu layout)
-        binding.root.findViewById<View>(R.id.fab_new_contact)?.setOnClickListener {
-            val action = ContactsFragmentDirections.actionContactsFragmentToNewChatFragment()
-            findNavController().navigate(action)
+            CoroutineScope(Dispatchers.Main).launch {
+                contactsAdapter.updateContacts(mockContacts)
+            }
         }
+    }
+
+    private fun onContactClick(contact: Contact) {
+        Toast.makeText(requireContext(), "Abrir chat com ${contact.name}", Toast.LENGTH_SHORT).show()
+
+        // Exemplo de navegação (descomente quando tiver o navigation graph configurado)
+        /*
+        val action = ContactsFragmentDirections.actionContactsFragmentToChatFragment(
+            contactId = contact.id.toLong(),
+            contactName = contact.name
+        )
+        findNavController().navigate(action)
+        */
     }
 
     override fun onDestroyView() {

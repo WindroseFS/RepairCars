@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/loginFragment"> <!-- Mudou o startDestination para login -->
+    app:startDestination="@id/loginFragment">
 
-    <!-- FRAGMENTS DE AUTENTICAÇÃO -->
+    <!-- Fragments de Autenticação -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.thorapps.repaircars.auth.LoginFragment"
-        android:label="LoginFragment"
+        android:label="Login"
         tools:layout="@layout/fragment_login">
 
         <action
@@ -17,24 +17,45 @@
             app:destination="@id/registerFragment" />
 
         <action
-            android:id="@+id/action_loginFragment_to_chatsFragment"
+            android:id="@+id/action_loginFragment_to_nav_chats"
+            app:destination="@id/nav_chats"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.thorapps.repaircars.auth.RegisterFragment"
+        android:label="Registro"
+        tools:layout="@layout/fragment_register">
+
+        <action
+            android:id="@+id/action_registerFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+
+        <!-- AÇÃO ADICIONADA: Register para Chats -->
+        <action
+            android:id="@+id/action_registerFragment_to_nav_chats"
             app:destination="@id/nav_chats"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />
 
     </fragment>
 
+    <!-- Fragment de Conversas -->
     <fragment
-        android:id="@+id/registerFragment"
-        android:name="com.thorapps.repaircars.auth.RegisterFragment"
-        android:label="RegisterFragment"
-        tools:layout="@layout/fragment_register">
+        android:id="@+id/nav_chats"
+        android:name="com.thorapps.repaircars.chat.ChatsFragment"
+        android:label="Conversas"
+        tools:layout="@layout/fragment_chats">
 
         <action
-            android:id="@+id/action_registerFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/registerFragment"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_chatsFragment_to_chatFragment"
+            app:destination="@id/nav_chat" />
+
+        <action
+            android:id="@+id/action_chatsFragment_to_contactsFragment"
+            app:destination="@id/nav_contacts" />
 
     </fragment>
 
@@ -45,9 +66,10 @@
         android:label="Chat"
         tools:layout="@layout/fragment_chat">
 
+        <!-- CORRIGIDO: contactId mudado de long para string -->
         <argument
             android:name="contactId"
-            app:argType="long" />
+            app:argType="string" />
 
         <argument
             android:name="contactName"
@@ -64,9 +86,9 @@
     <!-- Fragment de Novo Chat/Contato -->
     <fragment
         android:id="@+id/nav_new_chat"
-        android:name="com.thorapps.repaircars.contacts.NewChatFragment"
+        android:name="com.thorapps.repaircars.contacts.NewContactFragment"
         android:label="Novo Contato"
-        tools:layout="@layout/fragment_new_chat">
+        tools:layout="@layout/fragment_new_contact">
 
         <action
             android:id="@+id/action_newChatFragment_to_contactsFragment"
@@ -91,9 +113,19 @@
             android:id="@+id/action_contactsFragment_to_newChatFragment"
             app:destination="@id/nav_new_chat" />
 
+        <!-- AÇÃO CORRIGIDA: Agora passa contactId como string -->
         <action
             android:id="@+id/action_contactsFragment_to_chatFragment"
-            app:destination="@id/nav_chat" />
+            app:destination="@id/nav_chat">
+            <argument
+                android:name="contactId"
+                app:argType="string"
+                android:defaultValue="" />
+            <argument
+                android:name="contactName"
+                app:argType="string"
+                android:defaultValue="" />
+        </action>
 
         <action
             android:id="@+id/action_contactsFragment_to_chatsFragment"
@@ -102,42 +134,28 @@
 
     </fragment>
 
-    <!-- Fragment de Conversas -->
+    <!-- Fragment de Notícias -->
     <fragment
-        android:id="@+id/nav_chats"
-        android:name="com.thorapps.repaircars.chat.ChatsFragment"
-        android:label="Conversas"
-        tools:layout="@layout/fragment_chats">
+        android:id="@+id/nav_news"
+        android:name="com.thorapps.repaircars.news.NewsFragment"
+        android:label="Notícias"
+        tools:layout="@layout/fragment_news" />
 
-        <action
-            android:id="@+id/action_chatsFragment_to_chatFragment"
-            app:destination="@id/nav_chat" />
-
-        <action
-            android:id="@+id/action_chatsFragment_to_contactsFragment"
-            app:destination="@id/nav_contacts" />
-
-        <action
-            android:id="@+id/action_chatsFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true" />
-
-    </fragment>
-
-    <!-- Outros destinos -->
+    <!-- Fragment de Notificações -->
     <fragment
         android:id="@+id/nav_notifications"
         android:name="com.thorapps.repaircars.notifications.NotificationsFragment"
         android:label="Notificações"
         tools:layout="@layout/fragment_notifications" />
 
+    <!-- Fragment de Configurações -->
     <fragment
         android:id="@+id/nav_settings"
         android:name="com.thorapps.repaircars.settings.SettingsFragment"
         android:label="Configurações"
         tools:layout="@layout/fragment_settings" />
 
+    <!-- Fragment de Ajuda -->
     <fragment
         android:id="@+id/nav_help"
         android:name="com.thorapps.repaircars.help.HelpFragment"

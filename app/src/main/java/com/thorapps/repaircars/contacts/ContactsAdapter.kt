@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.R
 
 class ContactsAdapter(
-    private val contacts: List<Contact>,
+    private var contacts: List<Contact>,
     private val onItemClick: (Contact) -> Unit
 ) : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
 
@@ -24,11 +24,20 @@ class ContactsAdapter(
 
     override fun getItemCount() = contacts.size
 
+    fun updateContacts(newContacts: List<Contact>) {
+        contacts = newContacts
+        notifyDataSetChanged()
+    }
+
     inner class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(contact: Contact) {
-            // Use findViewById com os IDs corretos do seu item_contact.xml
-            itemView.findViewById<TextView>(R.id.text_contact_name)?.text = contact.name
-            itemView.findViewById<TextView>(R.id.text_contact_phone)?.text = contact.phone
+            itemView.findViewById<TextView>(R.id.tvContactName).text = contact.name
+            itemView.findViewById<TextView>(R.id.tvContactPhone).text = contact.phone ?: ""
+
+            // Se existir um TextView para última mensagem
+            itemView.findViewById<TextView>(R.id.tvLastMessage)?.let { lastMessageView ->
+                lastMessageView.text = contact.lastMessage ?: ""
+            }
 
             itemView.setOnClickListener {
                 onItemClick(contact)

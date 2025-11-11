@@ -1,22 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/light_gray"
+    android:background="#F5F5F5"
     tools:context=".news.NewsFragment">
 
-    <!-- Toolbar COM ID CORRETO -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:titleTextColor="@android:color/white"
-        app:title="Notícias de Automobilismo" />
+    <!-- REMOVIDA A TOOLBAR -->
 
     <!-- RecyclerView para as notícias -->
     <androidx.recyclerview.widget.RecyclerView
@@ -33,7 +24,7 @@
         android:layout_height="match_parent"
         android:text="Nenhuma notícia disponível"
         android:textSize="16sp"
-        android:textColor="@color/gray"
+        android:textColor="#808080"
         android:gravity="center"
         android:padding="32dp"
         android:visibility="gone" />

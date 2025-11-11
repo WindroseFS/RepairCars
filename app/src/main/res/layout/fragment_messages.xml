@@ -21,7 +21,7 @@
         android:id="@+id/textEmptyState"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/no_contacts_available"
+        android:text="Nenhum contato disponível"
         android:textSize="18sp"
         android:textColor="?android:attr/textColorSecondary"
         android:gravity="center"

@@ -4,46 +4,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.R
 import com.thorapps.repaircars.database.Message
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MessagesAdapter : ListAdapter<Message, MessagesAdapter.MessageViewHolder>(DiffCallback) {
+class SimpleMessagesAdapter(private var messages: List<Message>) :
+    RecyclerView.Adapter<SimpleMessagesAdapter.MessageViewHolder>() {
 
-    companion object {
-        val DiffCallback = object : DiffUtil.ItemCallback<Message>() {
-            override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
-                return oldItem.id == newItem.id
-            }
-
-            override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
-                return oldItem == newItem
-            }
-        }
+    fun updateMessages(newMessages: List<Message>) {
+        this.messages = newMessages
+        notifyDataSetChanged()
     }
 
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val receivedMessageContainer: View = itemView.findViewById(R.id.receivedMessageContainer)
         private val sentMessageContainer: View = itemView.findViewById(R.id.sentMessageContainer)
-        private val simpleMessageContainer: View = itemView.findViewById(R.id.simpleMessageContainer)
 
         private val tvReceivedMessage: TextView = itemView.findViewById(R.id.tvReceivedMessage)
         private val tvSentMessage: TextView = itemView.findViewById(R.id.tvSentMessage)
-        private val tvSimpleMessage: TextView = itemView.findViewById(R.id.tvSimpleMessage)
 
         private val tvReceivedTime: TextView = itemView.findViewById(R.id.tvReceivedTime)
         private val tvSentTime: TextView = itemView.findViewById(R.id.tvSentTime)
-        private val tvSimpleTime: TextView = itemView.findViewById(R.id.tvSimpleTime)
 
         fun bind(message: Message) {
             // Esconder todos os containers primeiro
             receivedMessageContainer.visibility = View.GONE
             sentMessageContainer.visibility = View.GONE
-            simpleMessageContainer.visibility = View.GONE
 
             if (message.isSentByMe) {
                 // Mensagem enviada por mim
@@ -72,7 +60,9 @@ class MessagesAdapter : ListAdapter<Message, MessagesAdapter.MessageViewHolder>(
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        val message = getItem(position)
+        val message = messages[position]
         holder.bind(message)
     }
+
+    override fun getItemCount(): Int = messages.size
 }

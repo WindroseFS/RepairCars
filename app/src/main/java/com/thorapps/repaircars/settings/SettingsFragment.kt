@@ -22,13 +22,14 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupViews()
+
+        // REMOVIDA referência à toolbar
+        setupSettings()
     }
 
-    private fun setupViews() {
-        binding.toolbar.setNavigationOnClickListener {
-            // Abrir drawer navigation
-        }
+    private fun setupSettings() {
+        // Configurar as opções de configurações aqui
+        // Exemplo: listeners para switches, botões, etc.
     }
 
     override fun onDestroyView() {

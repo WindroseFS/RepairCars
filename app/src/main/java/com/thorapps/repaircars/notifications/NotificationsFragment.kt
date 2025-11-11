@@ -22,13 +22,13 @@ class NotificationsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupViews()
+
+        // REMOVIDA referência à toolbar
+        setupNotifications()
     }
 
-    private fun setupViews() {
-        binding.toolbar.setNavigationOnClickListener {
-            // Abrir drawer navigation
-        }
+    private fun setupNotifications() {
+        // Configurar as notificações aqui
     }
 
     override fun onDestroyView() {

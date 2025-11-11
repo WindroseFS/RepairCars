@@ -1,14 +1,19 @@
 package com.thorapps.repaircars.chat
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
-@Parcelize
 data class Chat(
     val contactId: String,
     val contactName: String,
-    val contactPhone: String,
     val lastMessage: String,
     val timestamp: Long,
     val unreadCount: Int = 0
-) : Parcelable
+) {
+    fun getAvatarText(): String {
+        return if (contactName.isNotEmpty()) contactName[0].uppercase() else "?"
+    }
+
+    fun getFormattedTime(): String {
+        val date = java.util.Date(timestamp)
+        val format = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+        return format.format(date)
+    }
+}

@@ -6,7 +6,7 @@ pluginManagement {
         mavenCentral()
     }
     plugins {
-        id("com.android.application") version "8.13.0"
+        id("com.android.application") version "8.13.1"
         id("org.jetbrains.kotlin.android") version "2.0.21"
         id("androidx.navigation.safeargs") version "2.7.7"
     }

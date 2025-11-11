@@ -1,22 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:paddingVertical="4dp">
 
+    <!-- Container para mensagem recebida (alinhada à esquerda) -->
     <LinearLayout
+        android:id="@+id/receivedMessageContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/message_received_background"
+        android:padding="12dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintWidth_max="wrap"
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintHorizontal_bias="0"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="48dp">
+
+        <TextView
+            android:id="@+id/tvReceivedMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mensagem recebida"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvReceivedTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="10:30"
+            android:textColor="@color/gray"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+
+    <!-- Container para mensagem enviada (alinhada à direita) -->
+    <LinearLayout
+        android:id="@+id/sentMessageContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/message_sent_background"
+        android:padding="12dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintWidth_max="wrap"
+        app:layout_constraintWidth_percent="0.8"
+        app:layout_constraintHorizontal_bias="1"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="16dp">
+
+        <TextView
+            android:id="@+id/tvSentMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mensagem enviada"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvSentTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="10:30"
+            android:textColor="#CCFFFFFF"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+
+    <!-- Container para mensagem simples (compatibilidade com versão anterior) -->
+    <LinearLayout
+        android:id="@+id/simpleMessageContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:background="@drawable/message_background"
         android:padding="12dp"
-        android:layout_gravity="start"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:layout_gravity="start">
 
         <TextView
-            android:id="@+id/tvMessageText"
+            android:id="@+id/tvSimpleMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Esta é uma mensagem de exemplo"
@@ -24,17 +104,16 @@
             android:textSize="16sp"
             android:maxWidth="280dp" />
 
+        <TextView
+            android:id="@+id/tvSimpleTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10:30"
+            android:textSize="12sp"
+            android:textColor="@color/gray"
+            android:layout_gravity="start"
+            android:layout_marginTop="4dp" />
+
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvMessageTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="10:30"
-        android:textSize="12sp"
-        android:textColor="@color/gray"
-        android:layout_gravity="start"
-        android:layout_marginTop="4dp"
-        tools:layout_gravity="start" />
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,13 +22,13 @@ class HelpFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupViews()
+
+        // REMOVIDA referência à toolbar
+        setupHelpContent()
     }
 
-    private fun setupViews() {
-        binding.toolbar.setNavigationOnClickListener {
-            // Abrir drawer navigation
-        }
+    private fun setupHelpContent() {
+        // Configurar o conteúdo de ajuda aqui
     }
 
     override fun onDestroyView() {

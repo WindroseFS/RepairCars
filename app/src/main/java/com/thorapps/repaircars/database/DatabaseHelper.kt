@@ -7,12 +7,13 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.thorapps.repaircars.contacts.Contact
 
 class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {
         private const val DATABASE_NAME = "repaircars.db"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
 
         const val TABLE_CONTACTS = "contacts"
         const val TABLE_MESSAGES = "messages"
@@ -23,28 +24,26 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     override fun onCreate(db: SQLiteDatabase) {
         try {
-            // Tabela de contatos
             db.execSQL(
                 "CREATE TABLE $TABLE_CONTACTS(" +
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "id TEXT PRIMARY KEY," +
                         "name TEXT," +
+                        "phone TEXT," +
                         "email TEXT)"
             )
 
-            // Tabela de mensagens
             db.execSQL(
                 "CREATE TABLE $TABLE_MESSAGES(" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        "contactId INTEGER," +
+                        "contactId TEXT," +
                         "text TEXT," +
-                        "sender TEXT," +
+                        "isSentByMe INTEGER," +
                         "timestamp INTEGER," +
                         "latitude REAL," +
                         "longitude REAL," +
                         "has_options INTEGER DEFAULT 0)"
             )
 
-            // Tabela para opções de mensagem
             db.execSQL(
                 "CREATE TABLE $TABLE_MESSAGE_OPTIONS(" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -61,46 +60,115 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         try {
-            when (oldVersion) {
-                1 -> {
-                    db.execSQL("ALTER TABLE $TABLE_MESSAGES ADD COLUMN latitude REAL")
-                    db.execSQL("ALTER TABLE $TABLE_MESSAGES ADD COLUMN longitude REAL")
-                    // Continua para a versão 3
-                    oldVersion++
-                }
-                2 -> {
-                    db.execSQL("ALTER TABLE $TABLE_MESSAGES ADD COLUMN has_options INTEGER DEFAULT 0")
-                    db.execSQL(
-                        "CREATE TABLE $TABLE_MESSAGE_OPTIONS(" +
-                                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                                "messageId INTEGER," +
-                                "option_text TEXT," +
-                                "FOREIGN KEY(messageId) REFERENCES $TABLE_MESSAGES(id) ON DELETE CASCADE)"
-                    )
-                    Log.d(TAG, "Banco de dados atualizado da versão 2 para 3")
-                }
-                else -> {
-                    db.execSQL("DROP TABLE IF EXISTS $TABLE_CONTACTS")
-                    db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGES")
-                    db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGE_OPTIONS")
-                    onCreate(db)
-                    Log.d(TAG, "Banco de dados recriado na versão $newVersion")
+            var currentVersion = oldVersion
+
+            while (currentVersion < newVersion) {
+                when (currentVersion) {
+                    1, 2, 3 -> {
+                        try {
+                            db.execSQL("CREATE TABLE contacts_new (id TEXT PRIMARY KEY, name TEXT, phone TEXT, email TEXT)")
+                            db.execSQL("CREATE TABLE messages_new (id INTEGER PRIMARY KEY AUTOINCREMENT, contactId TEXT, text TEXT, isSentByMe INTEGER, timestamp INTEGER, latitude REAL, longitude REAL, has_options INTEGER DEFAULT 0)")
+
+                            val contactsCursor = db.rawQuery("SELECT id, name, phone, email FROM $TABLE_CONTACTS", null)
+                            contactsCursor.use { cursor ->
+                                while (cursor.moveToNext()) {
+                                    val oldId = cursor.getLong(0)
+                                    val name = cursor.getString(1)
+                                    val phone = if (!cursor.isNull(2)) cursor.getString(2) else null
+                                    val email = if (!cursor.isNull(3)) cursor.getString(3) else null
+
+                                    val newId = oldId.toString()
+                                    val values = ContentValues().apply {
+                                        put("id", newId)
+                                        put("name", name)
+                                        put("phone", phone)
+                                        put("email", email)
+                                    }
+                                    db.insert("contacts_new", null, values)
+                                }
+                            }
+
+                            val messagesCursor = db.rawQuery("SELECT id, contactId, text, isSentByMe, timestamp, latitude, longitude, has_options FROM $TABLE_MESSAGES", null)
+                            messagesCursor.use { cursor ->
+                                while (cursor.moveToNext()) {
+                                    val id = cursor.getLong(0)
+                                    val oldContactId = cursor.getLong(1)
+                                    val text = cursor.getString(2)
+                                    val isSentByMe = cursor.getInt(3)
+                                    val timestamp = cursor.getLong(4)
+                                    val latitude = if (!cursor.isNull(5)) cursor.getDouble(5) else null
+                                    val longitude = if (!cursor.isNull(6)) cursor.getDouble(6) else null
+                                    val hasOptions = cursor.getInt(7)
+
+                                    val newContactId = oldContactId.toString()
+                                    val values = ContentValues().apply {
+                                        put("id", id)
+                                        put("contactId", newContactId)
+                                        put("text", text)
+                                        put("isSentByMe", isSentByMe)
+                                        put("timestamp", timestamp)
+                                        if (latitude != null) put("latitude", latitude)
+                                        if (longitude != null) put("longitude", longitude)
+                                        put("has_options", hasOptions)
+                                    }
+                                    db.insert("messages_new", null, values)
+                                }
+                            }
+
+                            db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGE_OPTIONS")
+                            db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGES")
+                            db.execSQL("DROP TABLE IF EXISTS $TABLE_CONTACTS")
+
+                            db.execSQL("ALTER TABLE contacts_new RENAME TO $TABLE_CONTACTS")
+                            db.execSQL("ALTER TABLE messages_new RENAME TO $TABLE_MESSAGES")
+
+                            db.execSQL(
+                                "CREATE TABLE $TABLE_MESSAGE_OPTIONS(" +
+                                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                        "messageId INTEGER," +
+                                        "option_text TEXT," +
+                                        "FOREIGN KEY(messageId) REFERENCES $TABLE_MESSAGES(id) ON DELETE CASCADE)"
+                            )
+
+                            Log.d(TAG, "Migração para String IDs concluída com sucesso")
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Erro na migração: ${e.message}")
+                            db.execSQL("DROP TABLE IF EXISTS $TABLE_CONTACTS")
+                            db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGES")
+                            db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGE_OPTIONS")
+                            onCreate(db)
+                        }
+                        currentVersion++
+                    }
+                    else -> {
+                        db.execSQL("DROP TABLE IF EXISTS $TABLE_CONTACTS")
+                        db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGES")
+                        db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGE_OPTIONS")
+                        onCreate(db)
+                        Log.d(TAG, "Banco de dados recriado na versão $newVersion")
+                        currentVersion = newVersion
+                    }
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao atualizar banco de dados: ${e.message}")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_CONTACTS")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGES")
+            db.execSQL("DROP TABLE IF EXISTS $TABLE_MESSAGE_OPTIONS")
+            onCreate(db)
         }
     }
 
     suspend fun getAllContacts(): List<Contact> = withContext(Dispatchers.IO) {
         val contacts = mutableListOf<Contact>()
         try {
-            readableDatabase.rawQuery("SELECT id, name, email FROM $TABLE_CONTACTS", null).use { cursor ->
+            readableDatabase.rawQuery("SELECT id, name, phone, email FROM $TABLE_CONTACTS", null).use { cursor ->
                 while (cursor.moveToNext()) {
                     contacts.add(Contact(
-                        cursor.getLong(0),
-                        cursor.getString(1),
-                        cursor.getString(2)
+                        id = cursor.getString(0),
+                        name = cursor.getString(1),
+                        phone = if (!cursor.isNull(2)) cursor.getString(2) else null,
+                        email = if (!cursor.isNull(3)) cursor.getString(3) else null
                     ))
                 }
             }
@@ -115,7 +183,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         try {
             readableDatabase.rawQuery(
                 """
-                SELECT c.id, c.name, c.email, m.text
+                SELECT c.id, c.name, c.email, c.phone, m.text
                 FROM $TABLE_CONTACTS c
                 LEFT JOIN $TABLE_MESSAGES m ON m.id = (
                     SELECT id FROM $TABLE_MESSAGES 
@@ -126,11 +194,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 """.trimIndent(), null
             ).use { cursor ->
                 while (cursor.moveToNext()) {
-                    val id = cursor.getLong(0)
+                    val id = cursor.getString(0)
                     val name = cursor.getString(1)
                     val email = cursor.getString(2)
-                    val lastMessage = if (cursor.isNull(3)) "Sem mensagens" else cursor.getString(3)
-                    list.add(ContactDisplay(id, name, email, lastMessage))
+                    val phone = if (!cursor.isNull(3)) cursor.getString(3) else ""
+                    val lastMessage = if (cursor.isNull(4)) "Sem mensagens" else cursor.getString(4)
+
+                    val contact = Contact(id = id, name = name, email = email, phone = phone, lastMessage = lastMessage)
+                    list.add(ContactDisplay(contact, lastMessage))
                 }
             }
         } catch (e: Exception) {
@@ -139,25 +210,24 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         list
     }
 
-    suspend fun getMessagesForContact(contactId: Long): List<Message> =
+    suspend fun getMessagesForContact(contactId: String): List<Message> =
         withContext(Dispatchers.IO) {
             val messages = mutableListOf<Message>()
             try {
                 readableDatabase.rawQuery(
-                    "SELECT id, contactId, text, sender, timestamp, latitude, longitude, has_options FROM $TABLE_MESSAGES WHERE contactId = ? ORDER BY timestamp ASC",
-                    arrayOf(contactId.toString())
+                    "SELECT id, contactId, text, isSentByMe, timestamp, latitude, longitude, has_options FROM $TABLE_MESSAGES WHERE contactId = ? ORDER BY timestamp ASC",
+                    arrayOf(contactId)
                 ).use { cursor ->
                     while (cursor.moveToNext()) {
                         messages.add(
                             Message(
                                 id = cursor.getLong(0),
-                                contactId = cursor.getLong(1),
+                                contactId = cursor.getString(1),
                                 text = cursor.getString(2),
-                                sender = cursor.getString(3),
+                                isSentByMe = cursor.getInt(3) == 1,
                                 timestamp = cursor.getLong(4),
                                 latitude = if (!cursor.isNull(5)) cursor.getDouble(5) else null,
-                                longitude = if (!cursor.isNull(6)) cursor.getDouble(6) else null,
-                                hasOptions = cursor.getInt(7) == 1
+                                longitude = if (!cursor.isNull(6)) cursor.getDouble(6) else null
                             )
                         )
                     }
@@ -168,13 +238,13 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             messages
         }
 
-    suspend fun addMessage(contactId: Long, text: String, isSentByMe: Boolean, lat: Double? = null, lng: Double? = null): Long =
+    suspend fun addMessage(contactId: String, text: String, isSentByMe: Boolean, lat: Double? = null, lng: Double? = null): Long =
         withContext(Dispatchers.IO) {
             try {
                 val values = ContentValues().apply {
                     put("contactId", contactId)
                     put("text", text)
-                    put("sender", if (isSentByMe) "me" else "other")
+                    put("isSentByMe", if (isSentByMe) 1 else 0)
                     put("timestamp", System.currentTimeMillis())
                     put("has_options", 0)
                     if (lat != null) put("latitude", lat)
@@ -192,7 +262,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
 
     suspend fun addMessageWithOptions(
-        contactId: Long,
+        contactId: String,
         text: String,
         isSentByMe: Boolean,
         options: List<String>,
@@ -206,7 +276,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             val values = ContentValues().apply {
                 put("contactId", contactId)
                 put("text", text)
-                put("sender", if (isSentByMe) "me" else "other")
+                put("isSentByMe", if (isSentByMe) 1 else 0)
                 put("timestamp", System.currentTimeMillis())
                 put("has_options", if (options.isNotEmpty()) 1 else 0)
                 if (lat != null) put("latitude", lat)
@@ -258,45 +328,45 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         withContext(Dispatchers.IO) {
             try {
                 var message: Message? = null
+                var options = emptyList<String>()
 
                 readableDatabase.rawQuery(
-                    "SELECT id, contactId, text, sender, timestamp, latitude, longitude, has_options FROM $TABLE_MESSAGES WHERE id = ?",
+                    "SELECT id, contactId, text, isSentByMe, timestamp, latitude, longitude, has_options FROM $TABLE_MESSAGES WHERE id = ?",
                     arrayOf(messageId.toString())
                 ).use { cursor ->
                     if (cursor.moveToFirst()) {
                         message = Message(
                             id = cursor.getLong(0),
-                            contactId = cursor.getLong(1),
+                            contactId = cursor.getString(1),
                             text = cursor.getString(2),
-                            sender = cursor.getString(3),
+                            isSentByMe = cursor.getInt(3) == 1,
                             timestamp = cursor.getLong(4),
                             latitude = if (!cursor.isNull(5)) cursor.getDouble(5) else null,
-                            longitude = if (!cursor.isNull(6)) cursor.getDouble(6) else null,
-                            hasOptions = cursor.getInt(7) == 1
+                            longitude = if (!cursor.isNull(6)) cursor.getDouble(6) else null
                         )
+
+                        val hasOptions = cursor.getInt(7) == 1
+                        if (hasOptions) {
+                            options = getMessageOptions(messageId)
+                        }
                     }
                 }
 
-                message?.let { msg ->
-                    val options = if (msg.hasOptions) {
-                        getMessageOptions(messageId)
-                    } else {
-                        emptyList()
-                    }
-                    return@withContext MessageWithOptions(msg, options)
+                return@withContext message?.let { msg ->
+                    MessageWithOptions(msg, options)
                 }
-
-                null
             } catch (e: Exception) {
                 Log.e(TAG, "Erro ao obter mensagem com opções $messageId: ${e.message}")
                 null
             }
         }
 
-    suspend fun addContact(name: String, email: String): Long = withContext(Dispatchers.IO) {
+    suspend fun addContact(id: String, name: String, phone: String?, email: String?): Long = withContext(Dispatchers.IO) {
         try {
             val values = ContentValues().apply {
+                put("id", id)
                 put("name", name)
+                put("phone", phone)
                 put("email", email)
             }
             val result = writableDatabase.insert(TABLE_CONTACTS, null, values)
@@ -310,7 +380,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         }
     }
 
-    suspend fun addSampleMessages(contactId: Long) = withContext(Dispatchers.IO) {
+    fun generateContactId(): String {
+        return "contact_${System.currentTimeMillis()}_${(1000..9999).random()}"
+    }
+
+    suspend fun addSampleMessages(contactId: String) = withContext(Dispatchers.IO) {
         try {
             val sampleMessages = listOf(
                 MessageData(contactId, "Olá, preciso fazer uma revisão no meu carro", false),
@@ -360,7 +434,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 val values = ContentValues().apply {
                     put("contactId", messageData.contactId)
                     put("text", messageData.text)
-                    put("sender", if (messageData.isFromMe) "me" else "other")
+                    put("isSentByMe", if (messageData.isFromMe) 1 else 0)
                     put("timestamp", System.currentTimeMillis() - (Math.random() * 86400000 * 7).toLong())
                     put("has_options", 0)
                 }
@@ -379,15 +453,13 @@ data class MessageWithOptions(
     val options: List<String>
 )
 
-
-data class Contact(
-    val id: Long,
-    val name: String,
-    val email: String
+data class ContactDisplay(
+    val contact: Contact,
+    val lastMessage: String
 )
 
 private data class MessageData(
-    val contactId: Long,
+    val contactId: String,
     val text: String,
     val isFromMe: Boolean
 )

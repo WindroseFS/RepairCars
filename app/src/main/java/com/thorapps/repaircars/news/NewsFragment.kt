@@ -4,16 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.thorapps.repaircars.MainActivity
 import com.thorapps.repaircars.databinding.FragmentNewsBinding
 
 class NewsFragment : Fragment() {
 
     private var _binding: FragmentNewsBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var newsAdapter: NewsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,85 +27,116 @@ class NewsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupToolbar()
         setupRecyclerView()
-    }
-
-    private fun setupToolbar() {
-        // Em fragments, você pode usar requireActivity() para acessar a Activity
-        (requireActivity() as? androidx.appcompat.app.AppCompatActivity)?.apply {
-            setSupportActionBar(binding.toolbar)
-            supportActionBar?.apply {
-                title = "Notícias de Automobilismo"
-                setDisplayHomeAsUpEnabled(true)
-                setDisplayShowHomeEnabled(true)
-            }
-        }
+        loadNews()
     }
 
     private fun setupRecyclerView() {
-        val noticias = gerarNoticiasExemplo()
+        // CORREÇÃO: Configurar o adapter com uma lista vazia inicialmente
+        newsAdapter = NewsAdapter(emptyList()) { news ->
+            // Handle item click - você pode adicionar ação ao clicar em uma notícia
+            showNewsDetail(news)
+        }
 
         binding.recyclerNews.apply {
             layoutManager = LinearLayoutManager(requireContext())
-
-            addItemDecoration(
-                DividerItemDecoration(
-                    requireContext(),
-                    LinearLayoutManager.VERTICAL
-                )
-            )
-
-            adapter = NewsAdapter(noticias) { news ->
-                onNewsItemClicked(news)
-            }
+            adapter = newsAdapter
         }
+    }
 
-        if (noticias.isEmpty()) {
+    private fun loadNews() {
+        // Carregar notícias (dados mock por enquanto)
+        val news = listOf(
+            News(
+                titulo = "Novo Sistema de Diagnóstico Eletrônico",
+                descricao = "A Repair Cars acaba de implementar um sistema de diagnóstico eletrônico de última geração que permite identificar problemas com precisão milimétrica. Agilize o atendimento e tenha diagnósticos mais precisos.",
+                data = "25/11/2023"
+            ),
+            News(
+                titulo = "Promoção: Revisão Completa 30% Off",
+                descricao = "Aproveite nossa promoção especial de revisão completa com 30% de desconto. Inclui troca de óleo, filtros, verificação de freios e mais. Válida até o final do mês.",
+                data = "20/11/2023"
+            ),
+            News(
+                titulo = "Workshop: Mecânica Básica para Mulheres",
+                descricao = "Participe do nosso workshop gratuito de mecânica básica voltado para mulheres. Aprenda a trocar pneus, verificar óleo, identificar problemas básicos e muito mais. Inscrições abertas!",
+                data = "15/11/2023"
+            ),
+            News(
+                titulo = "Dicas para Manutenção Preventiva",
+                descricao = "Confira nossas dicas essenciais para manter seu veículo em perfeito estado. A manutenção preventiva pode evitar grandes prejuízos no futuro.",
+                data = "10/11/2023"
+            ),
+            News(
+                titulo = "Nova Unidade Inaugurada",
+                descricao = "Temos o prazer de anunciar a inauguração de nossa nova unidade no centro da cidade. Agora com mais espaço e equipamentos modernos para melhor atendê-lo.",
+                data = "05/11/2023"
+            )
+        )
+
+        setupNewsList(news)
+    }
+
+    private fun setupNewsList(news: List<News>) {
+        if (news.isEmpty()) {
             binding.textEmptyState.visibility = View.VISIBLE
             binding.recyclerNews.visibility = View.GONE
         } else {
             binding.textEmptyState.visibility = View.GONE
             binding.recyclerNews.visibility = View.VISIBLE
+
+            // CORREÇÃO: Atualizar o adapter com a lista de notícias
+            newsAdapter = NewsAdapter(news) { selectedNews ->
+                showNewsDetail(selectedNews)
+            }
+            binding.recyclerNews.adapter = newsAdapter
+
+            // Atualizar título com quantidade de notícias na toolbar principal
+            (requireActivity() as? MainActivity)?.supportActionBar?.title = "Notícias (${news.size})"
         }
     }
 
-    private fun onNewsItemClicked(news: News) {
-        Toast.makeText(
-            requireContext(),
-            "Abrindo: ${news.titulo}",
-            Toast.LENGTH_SHORT
-        ).show()
+    private fun showNewsDetail(news: News) {
+        // Mostrar detalhes da notícia (pode ser um dialog ou nova tela)
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle(news.titulo)
+            .setMessage("${news.descricao}\n\nData: ${news.data}")
+            .setPositiveButton("Fechar", null)
+            .show()
     }
 
-    private fun gerarNoticiasExemplo(): List<News> {
-        return listOf(
-            News(
-                "Max Verstappen vence GP do Japão",
-                "O piloto da Red Bull conquistou mais uma vitória dominante em Suzuka, confirmando seu tetracampeonato mundial.",
-                "08/10/2025"
-            ),
-            News(
-                "Ferrari anuncia novo motor híbrido para 2026",
-                "A Scuderia Ferrari revelou detalhes do seu novo propulsor híbrido, focado em maior eficiência energética.",
-                "06/10/2025"
-            ),
-            News(
-                "Toyota vence as 24 Horas de Le Mans",
-                "A equipe japonesa manteve sua hegemonia no endurance mundial com o GR010 Hybrid.",
-                "28/09/2025"
-            ),
-            News(
-                "Porsche apresenta 911 GT3 RS elétrico",
-                "A Porsche surpreendeu com um conceito de 911 totalmente elétrico, prometendo alto desempenho.",
-                "01/10/2025"
-            ),
-            News(
-                "McLaren expande na América do Sul",
-                "A McLaren abrirá um novo centro técnico no Brasil para suporte a clientes.",
-                "03/10/2025"
-            )
-        )
+    private fun refreshNews() {
+        // Simular atualização de notícias
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            loadNews()
+            android.widget.Toast.makeText(
+                requireContext(),
+                "Notícias atualizadas",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }, 1500)
+    }
+
+    private fun showFilterOptions() {
+        val categories = arrayOf("Todas", "Promoções", "Workshops", "Dicas", "Novidades")
+
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Filtrar Notícias")
+            .setItems(categories) { _, which ->
+                val selectedCategory = categories[which]
+                filterNewsByCategory(selectedCategory)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun filterNewsByCategory(category: String) {
+        // Implementar filtro por categoria
+        android.widget.Toast.makeText(
+            requireContext(),
+            "Filtrando por: $category",
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onDestroyView() {

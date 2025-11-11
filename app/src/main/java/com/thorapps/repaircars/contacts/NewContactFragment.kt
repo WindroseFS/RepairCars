@@ -7,18 +7,19 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.thorapps.repaircars.databinding.FragmentNewChatBinding
+import com.thorapps.repaircars.databinding.FragmentNewContactBinding
 
-class NewChatFragment : Fragment() {
 
-    private var _binding: FragmentNewChatBinding? = null
+class NewContactFragment : Fragment() {
+
+    private var _binding: FragmentNewContactBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentNewChatBinding.inflate(inflater, container, false)
+        _binding = FragmentNewContactBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -28,7 +29,7 @@ class NewChatFragment : Fragment() {
     }
 
     private fun setupViews() {
-        binding.toolbar.setNavigationOnClickListener {
+        binding.newChatToolbar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
 
@@ -58,7 +59,7 @@ class NewChatFragment : Fragment() {
         )
 
         // SAFE ARGS - Navegando com argumentos
-        val action = NewChatFragmentDirections.actionNewChatFragmentToContactsFragment(
+        val action = NewContactFragmentDirections.actionNewChatFragmentToContactsFragment(
             newContact = newContact
         )
         findNavController().navigate(action)

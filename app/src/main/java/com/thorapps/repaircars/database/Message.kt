@@ -5,16 +5,16 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Message(
-    val id: Long = 0,
-    val contactId: Long,
+    val id: Long,
+    val contactId: String,
     val text: String,
     val isSentByMe: Boolean,
-    val timestamp: Long = System.currentTimeMillis(),
+    val timestamp: Long,
     val latitude: Double? = null,
     val longitude: Double? = null
-) : Parcelable {
+): Parcelable {
     constructor(
-        contactId: Long,
+        contactId: String,
         text: String,
         isSentByMe: Boolean,
         timestamp: Long = System.currentTimeMillis(),

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.R
-import com.thorapps.repaircars.data.models.Contact
+import com.thorapps.repaircars.contacts.Contact
 
 class ContactsAdapter(
     private val contacts: List<Contact>
@@ -19,7 +19,7 @@ class ContactsAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_contact_database, parent, false) // Use different layout
+            .inflate(R.layout.item_contact, parent, false) // Use different layout
         return ContactViewHolder(view)
     }
 
