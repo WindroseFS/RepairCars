@@ -9,8 +9,8 @@
         <option name="gradleJvm" value="jbr-21" />
         <option name="modules">
           <set>
-            <option value="/var/home/Windrose/StudioProjects/RepairCars" />
-            <option value="/var/home/Windrose/StudioProjects/RepairCars/app" />
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
       </GradleProjectSettings>

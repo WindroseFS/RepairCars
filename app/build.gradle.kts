@@ -19,6 +19,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -47,7 +48,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        dataBinding = false
     }
 }
 
@@ -92,20 +92,8 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
 
-    // Testing
+    // Testes
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-}
-
-configurations.all {
-    resolutionStrategy {
-        eachDependency {
-            when (requested.group) {
-                "org.jetbrains.kotlin" -> useVersion("1.9.22")
-                "androidx.databinding" -> useVersion("8.2.2")
-                "androidx.navigation" -> useVersion("2.7.7")
-            }
-        }
-    }
 }

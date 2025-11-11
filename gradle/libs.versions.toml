@@ -53,8 +53,8 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx" }
+firebase-database = { group = "com.google.firebase", name = "firebase-database-ktx", version.ref = "firebaseDatabase" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
