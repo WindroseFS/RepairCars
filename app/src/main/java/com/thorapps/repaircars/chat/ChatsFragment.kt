@@ -1,13 +1,18 @@
 package com.thorapps.repaircars.chat
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.thorapps.repaircars.database.DatabaseHelper
 import com.thorapps.repaircars.databinding.FragmentChatsBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ChatsFragment : Fragment() {
 
@@ -15,6 +20,7 @@ class ChatsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var chatsAdapter: ChatsAdapter
+    private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,13 +33,19 @@ class ChatsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        databaseHelper = DatabaseHelper(requireContext())
+
         setupRecyclerView()
         setupClickListeners()
-        loadSampleChats()
+
+        // Inicializa dados de exemplo se necessário
+        CoroutineScope(Dispatchers.IO).launch {
+            databaseHelper.initializeSampleData()
+            loadChats()
+        }
     }
 
     private fun setupRecyclerView() {
-        // Configurar o RecyclerView com o ID correto do seu layout
         chatsAdapter = ChatsAdapter { contactId, contactName ->
             navigateToChat(contactId, contactName)
         }
@@ -51,49 +63,57 @@ class ChatsFragment : Fragment() {
         }
     }
 
-    private fun loadSampleChats() {
-        val sampleChats = listOf(
-            Chat(
-                contactId = "1",
-                contactName = "Oficina Central",
-                lastMessage = "Olá! Como posso ajudar com seu veículo?",
-                timestamp = System.currentTimeMillis() - 300000, // 5 minutos atrás
-                unreadCount = 2
-            ),
-            Chat(
-                contactId = "2",
-                contactName = "Suporte Técnico",
-                lastMessage = "Seu orçamento está pronto para revisão",
-                timestamp = System.currentTimeMillis() - 3600000, // 1 hora atrás
-                unreadCount = 1
-            ),
-            Chat(
-                contactId = "3",
-                contactName = "Mecânico João",
-                lastMessage = "As peças chegaram, podemos agendar?",
-                timestamp = System.currentTimeMillis() - 86400000, // 1 dia atrás
-                unreadCount = 0
-            ),
-            Chat(
-                contactId = "4",
-                contactName = "Atendimento",
-                lastMessage = "Lembramos que sua revisão está agendada",
-                timestamp = System.currentTimeMillis() - 172800000, // 2 dias atrás
-                unreadCount = 0
-            ),
-            Chat(
-                contactId = "5",
-                contactName = "Gerente Carlos",
-                lastMessage = "Temos uma promoção especial para clientes",
-                timestamp = System.currentTimeMillis() - 259200000, // 3 dias atrás
-                unreadCount = 0
-            )
-        )
+    private fun loadChats() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val contactsWithMessages = databaseHelper.getContactsWithLastMessage()
 
-        chatsAdapter.submitList(sampleChats)
+                Log.d("ChatsFragment", "Encontrados ${contactsWithMessages.size} contatos com mensagens")
+
+                if (contactsWithMessages.isEmpty()) {
+                    // Se não há chats, mostra estado vazio
+                    CoroutineScope(Dispatchers.Main).launch {
+                        showEmptyState()
+                    }
+                } else {
+                    // Converte ContactDisplay para Chat
+                    val chats = contactsWithMessages.map { contactDisplay ->
+                        Chat(
+                            contactId = contactDisplay.contact.id,
+                            contactName = contactDisplay.contact.name,
+                            lastMessage = contactDisplay.lastMessage,
+                            timestamp = System.currentTimeMillis(),
+                            unreadCount = 0
+                        )
+                    }
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        hideEmptyState()
+                        chatsAdapter.submitList(chats)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ChatsFragment", "Erro ao carregar chats: ${e.message}")
+                CoroutineScope(Dispatchers.Main).launch {
+                    showEmptyState()
+                }
+            }
+        }
+    }
+
+    private fun showEmptyState() {
+        // Você pode adicionar uma view de estado vazio aqui
+        binding.recyclerViewChats.visibility = View.GONE
+        // binding.emptyStateView.visibility = View.VISIBLE
+    }
+
+    private fun hideEmptyState() {
+        binding.recyclerViewChats.visibility = View.VISIBLE
+        // binding.emptyStateView.visibility = View.GONE
     }
 
     private fun navigateToChat(contactId: String, contactName: String) {
+        Log.d("ChatsFragment", "Navegando para chat: $contactName ($contactId)")
         val action = ChatsFragmentDirections.actionChatsFragmentToChatFragment(
             contactId = contactId,
             contactName = contactName
@@ -102,10 +122,14 @@ class ChatsFragment : Fragment() {
     }
 
     private fun navigateToContacts() {
-        val action = ChatsFragmentDirections.actionChatsFragmentToContactsFragment(
-            newContact = null
-        )
+        val action = ChatsFragmentDirections.actionChatsFragmentToContactsFragment()
         findNavController().navigate(action)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Recarrega os chats quando o fragment é retomado
+        loadChats()
     }
 
     override fun onDestroyView() {

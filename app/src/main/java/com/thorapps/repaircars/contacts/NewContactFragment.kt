@@ -6,12 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.thorapps.repaircars.database.DatabaseHelper
 import com.thorapps.repaircars.databinding.FragmentNewContactBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NewContactFragment : Fragment() {
 
     private var _binding: FragmentNewContactBinding? = null
     private val binding get() = _binding!!
+    private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,12 +29,12 @@ class NewContactFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        databaseHelper = DatabaseHelper(requireContext())
         setupClickListeners()
     }
 
     private fun setupClickListeners() {
         binding.btnCancel.setOnClickListener {
-            // ✅ Navega de volta para ContactsFragment
             findNavController().navigateUp()
         }
 
@@ -44,7 +49,6 @@ class NewContactFragment : Fragment() {
         val email = binding.etContactEmail.text.toString().trim()
 
         if (name.isEmpty() || phone.isEmpty()) {
-            // Mostrar erro se campos obrigatórios estiverem vazios
             if (name.isEmpty()) {
                 binding.etContactName.error = "Nome é obrigatório"
             }
@@ -54,19 +58,20 @@ class NewContactFragment : Fragment() {
             return
         }
 
-        // Criar novo contato
-        val newContact = Contact(
-            id = System.currentTimeMillis().toString(),
-            name = name,
-            phone = phone,
-            email = if (email.isNotEmpty()) email else null
-        )
+        // Gera ID único para o contato
+        val contactId = databaseHelper.generateContactId()
 
-        // ✅ Navegar de volta para ContactsFragment passando o novo contato
-        val action = NewContactFragmentDirections.actionNewChatFragmentToContactsFragment(
-            newContact = newContact
-        )
-        findNavController().navigate(action)
+        // Salva no banco de dados
+        CoroutineScope(Dispatchers.IO).launch {
+            val result = databaseHelper.addContact(contactId, name, phone, email)
+
+            CoroutineScope(Dispatchers.Main).launch {
+                if (result != -1L) {
+                    // Navega de volta para ContactsFragment
+                    findNavController().navigateUp()
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {

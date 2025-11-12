@@ -1,15 +1,19 @@
 package com.thorapps.repaircars.chat
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.thorapps.repaircars.database.DatabaseHelper
 import com.thorapps.repaircars.database.Message
 import com.thorapps.repaircars.databinding.FragmentChatBinding
-import java.util.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ChatFragment : Fragment() {
 
@@ -20,6 +24,7 @@ class ChatFragment : Fragment() {
 
     private lateinit var messagesAdapter: SimpleMessagesAdapter
     private val messagesList = mutableListOf<Message>()
+    private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,21 +37,24 @@ class ChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        databaseHelper = DatabaseHelper(requireContext())
+
         val contactId = args.contactId
         val contactName = args.contactName
 
+        Log.d("ChatFragment", "Abrindo chat com: $contactName ($contactId)")
+
         setupToolbar(contactName)
         setupChat()
-        loadSampleMessages(contactId)
+        loadMessages(contactId)
     }
 
     private fun setupToolbar(contactName: String) {
-        // ✅ CORREÇÃO: Apenas define o título, a navegação é gerenciada pelo MainActivity
-        // O MainActivity já configura a seta de voltar automaticamente para este fragment
+        // Define o título da toolbar da Activity
+        activity?.title = contactName
     }
 
     private fun setupChat() {
-        // Configurar RecyclerView com o adapter simples
         messagesAdapter = SimpleMessagesAdapter(messagesList)
         binding.messagesRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext()).apply {
@@ -55,63 +63,53 @@ class ChatFragment : Fragment() {
             adapter = messagesAdapter
         }
 
-        // Configurar botão de enviar
         binding.btnSend.setOnClickListener {
             sendMessage()
         }
 
-        // Configurar botão de localização
         binding.btnLocation.setOnClickListener {
             shareLocation()
         }
     }
 
-    private fun loadSampleMessages(contactId: String) {
-        // Mensagens de exemplo
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.MINUTE, -5)
+    private fun loadMessages(contactId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val messages = databaseHelper.getMessagesForContact(contactId)
 
-        messagesList.clear()
-        messagesList.addAll(listOf(
-            Message(
-                id = 1,
-                contactId = contactId,
-                text = "Olá! Como posso ajudar com seu veículo?",
-                isSentByMe = false,
-                timestamp = calendar.timeInMillis
-            ),
-            Message(
-                id = 2,
-                contactId = contactId,
-                text = "Preciso de ajuda com o motor do meu carro",
-                isSentByMe = true,
-                timestamp = calendar.apply { add(Calendar.MINUTE, 1) }.timeInMillis
-            ),
-            Message(
-                id = 3,
-                contactId = contactId,
-                text = "Claro! Qual modelo e qual problema específico?",
-                isSentByMe = false,
-                timestamp = calendar.apply { add(Calendar.MINUTE, 1) }.timeInMillis
-            ),
-            Message(
-                id = 4,
-                contactId = contactId,
-                text = "É um Honda Civic 2020, está fazendo um barulho estranho ao acelerar",
-                isSentByMe = true,
-                timestamp = calendar.apply { add(Calendar.MINUTE, 1) }.timeInMillis
-            ),
-            Message(
-                id = 5,
-                contactId = contactId,
-                text = "Pode ser problema na correia dentada. Traga para uma avaliação gratuita",
-                isSentByMe = false,
-                timestamp = calendar.apply { add(Calendar.MINUTE, 1) }.timeInMillis
-            )
-        ))
+                Log.d("ChatFragment", "Carregadas ${messages.size} mensagens para o contato $contactId")
 
-        messagesAdapter.updateMessages(messagesList)
-        scrollToBottom()
+                CoroutineScope(Dispatchers.Main).launch {
+                    messagesList.clear()
+                    messagesList.addAll(messages)
+                    messagesAdapter.updateMessages(messagesList)
+                    scrollToBottom()
+
+                    // Se não há mensagens, mostra estado vazio
+                    if (messages.isEmpty()) {
+                        showEmptyState()
+                    } else {
+                        hideEmptyState()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ChatFragment", "Erro ao carregar mensagens: ${e.message}")
+                CoroutineScope(Dispatchers.Main).launch {
+                    showEmptyState()
+                }
+            }
+        }
+    }
+
+    private fun showEmptyState() {
+        // Você pode adicionar uma view de estado vazio aqui
+        binding.messagesRecyclerView.visibility = View.GONE
+        // binding.emptyStateView.visibility = View.VISIBLE
+    }
+
+    private fun hideEmptyState() {
+        binding.messagesRecyclerView.visibility = View.VISIBLE
+        // binding.emptyStateView.visibility = View.GONE
     }
 
     private fun sendMessage() {
@@ -131,6 +129,15 @@ class ChatFragment : Fragment() {
             binding.etMessage.text?.clear()
             scrollToBottom()
 
+            // Salva no banco
+            CoroutineScope(Dispatchers.IO).launch {
+                databaseHelper.addMessage(
+                    args.contactId,
+                    messageText,
+                    true
+                )
+            }
+
             simulateResponse()
         }
     }
@@ -141,7 +148,8 @@ class ChatFragment : Fragment() {
                 "Entendi, vou verificar isso para você",
                 "Pode me dar mais detalhes sobre o barulho?",
                 "Posso ajudar com isso sim!",
-                "Vou consultar nossa equipe técnica sobre esse problema"
+                "Vou consultar nossa equipe técnica sobre esse problema",
+                "Podemos agendar uma avaliação para seu veículo"
             )
             val randomResponse = responses.random()
 
@@ -156,6 +164,15 @@ class ChatFragment : Fragment() {
             messagesList.add(responseMessage)
             messagesAdapter.updateMessages(messagesList)
             scrollToBottom()
+
+            // Salva resposta no banco
+            CoroutineScope(Dispatchers.IO).launch {
+                databaseHelper.addMessage(
+                    args.contactId,
+                    randomResponse,
+                    false
+                )
+            }
         }, 1500)
     }
 
@@ -166,13 +183,24 @@ class ChatFragment : Fragment() {
             text = "📍 Localização compartilhada - Oficina Central",
             isSentByMe = true,
             timestamp = System.currentTimeMillis(),
-            latitude = -23.5505, // Exemplo: latitude de São Paulo
-            longitude = -46.6333 // Exemplo: longitude de São Paulo
+            latitude = -23.5505,
+            longitude = -46.6333
         )
 
         messagesList.add(locationMessage)
         messagesAdapter.updateMessages(messagesList)
         scrollToBottom()
+
+        // Salva no banco
+        CoroutineScope(Dispatchers.IO).launch {
+            databaseHelper.addMessage(
+                args.contactId,
+                "📍 Localização compartilhada - Oficina Central",
+                true,
+                -23.5505,
+                -46.6333
+            )
+        }
     }
 
     private fun scrollToBottom() {

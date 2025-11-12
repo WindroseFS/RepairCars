@@ -183,14 +183,16 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         try {
             readableDatabase.rawQuery(
                 """
-                SELECT c.id, c.name, c.email, c.phone, m.text
+                SELECT c.id, c.name, c.email, c.phone, 
+                       (SELECT text FROM $TABLE_MESSAGES 
+                        WHERE contactId = c.id 
+                        ORDER BY timestamp DESC LIMIT 1) as last_message,
+                       (SELECT timestamp FROM $TABLE_MESSAGES 
+                        WHERE contactId = c.id 
+                        ORDER BY timestamp DESC LIMIT 1) as last_timestamp
                 FROM $TABLE_CONTACTS c
-                LEFT JOIN $TABLE_MESSAGES m ON m.id = (
-                    SELECT id FROM $TABLE_MESSAGES 
-                    WHERE contactId = c.id
-                    ORDER BY timestamp DESC LIMIT 1
-                )
-                ORDER BY m.timestamp DESC
+                WHERE EXISTS (SELECT 1 FROM $TABLE_MESSAGES m WHERE m.contactId = c.id)
+                ORDER BY last_timestamp DESC
                 """.trimIndent(), null
             ).use { cursor ->
                 while (cursor.moveToNext()) {
@@ -215,7 +217,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             val messages = mutableListOf<Message>()
             try {
                 readableDatabase.rawQuery(
-                    "SELECT id, contactId, text, isSentByMe, timestamp, latitude, longitude, has_options FROM $TABLE_MESSAGES WHERE contactId = ? ORDER BY timestamp ASC",
+                    "SELECT id, contactId, text, isSentByMe, timestamp, latitude, longitude FROM $TABLE_MESSAGES WHERE contactId = ? ORDER BY timestamp ASC",
                     arrayOf(contactId)
                 ).use { cursor ->
                     while (cursor.moveToNext()) {
@@ -232,6 +234,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         )
                     }
                 }
+                Log.d(TAG, "Carregadas ${messages.size} mensagens para contato $contactId")
             } catch (e: Exception) {
                 Log.e(TAG, "Erro ao obter mensagens para contato $contactId: ${e.message}")
             }
@@ -246,13 +249,14 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     put("text", text)
                     put("isSentByMe", if (isSentByMe) 1 else 0)
                     put("timestamp", System.currentTimeMillis())
-                    put("has_options", 0)
                     if (lat != null) put("latitude", lat)
                     if (lng != null) put("longitude", lng)
                 }
                 val result = writableDatabase.insert(TABLE_MESSAGES, null, values)
                 if (result == -1L) {
                     Log.e(TAG, "Erro ao inserir mensagem no banco")
+                } else {
+                    Log.d(TAG, "Mensagem inserida com sucesso para contato $contactId")
                 }
                 result
             } catch (e: Exception) {
@@ -261,6 +265,101 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             }
         }
 
+    suspend fun contactExists(contactId: String): Boolean = withContext(Dispatchers.IO) {
+        try {
+            readableDatabase.rawQuery(
+                "SELECT 1 FROM $TABLE_CONTACTS WHERE id = ?",
+                arrayOf(contactId)
+            ).use { cursor ->
+                return@use cursor.moveToFirst()
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun addContact(id: String, name: String, phone: String?, email: String?): Long = withContext(Dispatchers.IO) {
+        try {
+            val values = ContentValues().apply {
+                put("id", id)
+                put("name", name)
+                put("phone", phone)
+                put("email", email)
+            }
+            val result = writableDatabase.insert(TABLE_CONTACTS, null, values)
+            if (result == -1L) {
+                Log.e(TAG, "Erro ao inserir contato no banco")
+            } else {
+                Log.d(TAG, "Contato $name inserido com sucesso")
+            }
+            result
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao adicionar contato: ${e.message}")
+            -1L
+        }
+    }
+
+    fun generateContactId(): String {
+        return "contact_${System.currentTimeMillis()}_${(1000..9999).random()}"
+    }
+
+    suspend fun initializeSampleData() = withContext(Dispatchers.IO) {
+        try {
+            // Verifica se já existem contatos para não duplicar
+            val existingContacts = getAllContacts()
+            if (existingContacts.isEmpty()) {
+                Log.d(TAG, "Inicializando dados de exemplo...")
+
+                val sampleContacts = listOf(
+                    ContactData("1", "Oficina Central", "(21) 99999-1111", "oficina@repaircars.com"),
+                    ContactData("2", "Suporte Técnico", "(21) 98888-2222", "suporte@repaircars.com"),
+                    ContactData("3", "Mecânico João", "(21) 97777-3333", "joao@repaircars.com"),
+                    ContactData("4", "Atendimento", "(21) 96666-4444", "atendimento@repaircars.com"),
+                    ContactData("5", "Gerente Carlos", "(21) 95555-5555", "carlos@repaircars.com")
+                )
+
+                // Adiciona contatos
+                sampleContacts.forEach { contactData ->
+                    addContact(contactData.id, contactData.name, contactData.phone, contactData.email)
+                }
+
+                // Adiciona mensagens de exemplo para cada contato
+                sampleContacts.forEach { contactData ->
+                    addSampleMessages(contactData.id, contactData.name)
+                }
+
+                Log.d(TAG, "Dados de exemplo inicializados com sucesso")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao inicializar dados de exemplo: ${e.message}")
+        }
+    }
+
+    private suspend fun addSampleMessages(contactId: String, contactName: String) = withContext(Dispatchers.IO) {
+        try {
+            val sampleMessages = listOf(
+                MessageData(contactId, "Olá! Como posso ajudar com seu veículo?", false),
+                MessageData(contactId, "Preciso de ajuda com o motor do meu carro", true),
+                MessageData(contactId, "Claro! Qual modelo e qual problema específico?", false),
+                MessageData(contactId, "É um Honda Civic 2020, está fazendo um barulho estranho", true),
+                MessageData(contactId, "Pode ser problema na correia dentada. Traga para uma avaliação", false)
+            )
+
+            sampleMessages.forEach { messageData ->
+                addMessage(
+                    messageData.contactId,
+                    messageData.text,
+                    messageData.isFromMe
+                )
+            }
+
+            Log.d(TAG, "Mensagens de exemplo adicionadas para $contactName")
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao adicionar mensagens de exemplo para $contactName: ${e.message}")
+        }
+    }
+
+    // Métodos existentes para opções de mensagens
     suspend fun addMessageWithOptions(
         contactId: String,
         text: String,
@@ -361,30 +460,8 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             }
         }
 
-    suspend fun addContact(id: String, name: String, phone: String?, email: String?): Long = withContext(Dispatchers.IO) {
-        try {
-            val values = ContentValues().apply {
-                put("id", id)
-                put("name", name)
-                put("phone", phone)
-                put("email", email)
-            }
-            val result = writableDatabase.insert(TABLE_CONTACTS, null, values)
-            if (result == -1L) {
-                Log.e(TAG, "Erro ao inserir contato no banco")
-            }
-            result
-        } catch (e: Exception) {
-            Log.e(TAG, "Erro ao adicionar contato: ${e.message}")
-            -1L
-        }
-    }
-
-    fun generateContactId(): String {
-        return "contact_${System.currentTimeMillis()}_${(1000..9999).random()}"
-    }
-
-    suspend fun addSampleMessages(contactId: String) = withContext(Dispatchers.IO) {
+    // Método original para adicionar mensagens de exemplo detalhadas
+    suspend fun addDetailedSampleMessages(contactId: String) = withContext(Dispatchers.IO) {
         try {
             val sampleMessages = listOf(
                 MessageData(contactId, "Olá, preciso fazer uma revisão no meu carro", false),
@@ -441,9 +518,9 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 writableDatabase.insert(TABLE_MESSAGES, null, values)
             }
 
-            Log.d(TAG, "Mensagens de exemplo adicionadas para contato $contactId")
+            Log.d(TAG, "Mensagens detalhadas de exemplo adicionadas para contato $contactId")
         } catch (e: Exception) {
-            Log.e(TAG, "Erro ao adicionar mensagens de exemplo: ${e.message}")
+            Log.e(TAG, "Erro ao adicionar mensagens detalhadas de exemplo: ${e.message}")
         }
     }
 }
@@ -462,4 +539,11 @@ private data class MessageData(
     val contactId: String,
     val text: String,
     val isFromMe: Boolean
+)
+
+private data class ContactData(
+    val id: String,
+    val name: String,
+    val phone: String,
+    val email: String
 )

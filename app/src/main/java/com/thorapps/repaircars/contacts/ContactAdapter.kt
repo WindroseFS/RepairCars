@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.databinding.ItemContactBinding
 
 class ContactAdapter(
-    private val contacts: List<Contact>,
+    private var contacts: List<Contact>,
     private val onClick: (Contact) -> Unit
 ) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>() {
 
@@ -55,5 +55,9 @@ class ContactAdapter(
             contactItem.setOnClickListener { onClick(contact) }
         }
     }
-}
 
+    fun updateContacts(newContacts: List<Contact>) {
+        contacts = newContacts
+        notifyDataSetChanged()
+    }
+}

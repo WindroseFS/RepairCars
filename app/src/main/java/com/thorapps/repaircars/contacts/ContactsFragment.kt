@@ -1,20 +1,26 @@
 package com.thorapps.repaircars.contacts
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
+import com.thorapps.repaircars.database.DatabaseHelper
 import com.thorapps.repaircars.databinding.FragmentContactsBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ContactsFragment : Fragment() {
 
     private var _binding: FragmentContactsBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var contactsAdapter: ContactsAdapter
+    private lateinit var contactsAdapter: ContactAdapter
+    private lateinit var databaseHelper: DatabaseHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,20 +33,22 @@ class ContactsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        databaseHelper = DatabaseHelper(requireContext())
+
         setupRecyclerView()
         setupFab()
+        loadContacts()
     }
 
     private fun setupRecyclerView() {
-        val contacts = loadSampleContacts()
-
-        contactsAdapter = ContactsAdapter(contacts) { contact ->
-            Snackbar.make(
-                requireView(),
-                "Contato selecionado: ${contact.name}",
-                Snackbar.LENGTH_SHORT
-            ).show()
-            // Aqui você pode navegar para o ChatFragment, por exemplo
+        contactsAdapter = ContactAdapter(emptyList()) { contact ->
+            Log.d("ContactsFragment", "Contato selecionado: ${contact.name} (${contact.id})")
+            // Navega para o chat com este contato
+            val action = ContactsFragmentDirections.actionContactsFragmentToChatFragment(
+                contactId = contact.id,
+                contactName = contact.name
+            )
+            findNavController().navigate(action)
         }
 
         binding.contactsRecyclerView.apply {
@@ -51,50 +59,42 @@ class ContactsFragment : Fragment() {
 
     private fun setupFab() {
         binding.fabAddContact.setOnClickListener {
-            Snackbar.make(it, "Adicionar novo contato", Snackbar.LENGTH_SHORT).show()
-            // Aqui você pode navegar para NewContactFragment
+            // Navega para NewContactFragment
+            val action = ContactsFragmentDirections.actionContactsFragmentToNewChatFragment()
+            findNavController().navigate(action)
         }
     }
 
-    /** 🔹 Carrega contatos fictícios (mesmo estilo de loadSampleChats) */
-    private fun loadSampleContacts(): List<Contact> {
-        return listOf(
-            Contact(
-                id = "1",
-                name = "Oficina Central",
-                phone = "(21) 99999-1111",
-                email = "oficina@repaircars.com",
-                lastMessage = "Olá! Como posso ajudar com seu veículo?"
-            ),
-            Contact(
-                id = "2",
-                name = "Suporte Técnico",
-                phone = "(21) 98888-2222",
-                email = "suporte@repaircars.com",
-                lastMessage = "Seu orçamento está pronto para revisão"
-            ),
-            Contact(
-                id = "3",
-                name = "Mecânico João",
-                phone = "(21) 97777-3333",
-                email = "joao@repaircars.com",
-                lastMessage = "As peças chegaram, podemos agendar?"
-            ),
-            Contact(
-                id = "4",
-                name = "Atendimento",
-                phone = "(21) 96666-4444",
-                email = "atendimento@repaircars.com",
-                lastMessage = "Lembramos que sua revisão está agendada"
-            ),
-            Contact(
-                id = "5",
-                name = "Gerente Carlos",
-                phone = "(21) 95555-5555",
-                email = "carlos@repaircars.com",
-                lastMessage = "Temos uma promoção especial para clientes"
-            )
-        )
+    private fun loadContacts() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val contacts = databaseHelper.getAllContacts()
+
+                Log.d("ContactsFragment", "Carregados ${contacts.size} contatos")
+
+                if (contacts.isEmpty()) {
+                    // Inicializa dados de exemplo se não há contatos
+                    databaseHelper.initializeSampleData()
+                    // Recarrega contatos após inicialização
+                    val updatedContacts = databaseHelper.getAllContacts()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        contactsAdapter.updateContacts(updatedContacts)
+                    }
+                } else {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        contactsAdapter.updateContacts(contacts)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ContactsFragment", "Erro ao carregar contatos: ${e.message}")
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Recarrega contatos quando o fragment é retomado
+        loadContacts()
     }
 
     override fun onDestroyView() {

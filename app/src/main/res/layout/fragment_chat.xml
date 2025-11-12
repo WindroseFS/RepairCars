@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/background">
 
-    <!-- REMOVIDA A TOOLBAR -->
-
+    <!-- RecyclerView para mostrar as mensagens -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messagesRecyclerView"
         android:layout_width="match_parent"
@@ -16,12 +16,13 @@
         android:padding="8dp"
         tools:listitem="@layout/item_message" />
 
+    <!-- Layout de entrada de mensagem -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="8dp"
-        android:background="@android:color/white">
+        android:background="@color/white">
 
         <ImageButton
             android:id="@+id/btnLocation"
@@ -29,7 +30,7 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_location"
-            android:contentDescription="Enviar localização"
+            android:contentDescription="Compartilhar localização"
             android:layout_marginEnd="8dp" />
 
         <EditText
@@ -37,9 +38,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Digite sua mensagem..."
+            android:hint="Digite uma mensagem..."
             android:maxLines="3"
-            android:inputType="textMultiLine"
+            android:padding="12dp"
             android:background="@drawable/edittext_background" />
 
         <ImageButton

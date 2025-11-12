@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.setMargins
 import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.R
 import com.thorapps.repaircars.database.Message
@@ -13,36 +14,36 @@ import java.util.*
 class SimpleMessagesAdapter(private var messages: List<Message>) :
     RecyclerView.Adapter<SimpleMessagesAdapter.MessageViewHolder>() {
 
-    fun updateMessages(newMessages: List<Message>) {
-        this.messages = newMessages
-        notifyDataSetChanged()
-    }
-
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val receivedMessageContainer: View = itemView.findViewById(R.id.receivedMessageContainer)
-        private val sentMessageContainer: View = itemView.findViewById(R.id.sentMessageContainer)
-
-        private val tvReceivedMessage: TextView = itemView.findViewById(R.id.tvReceivedMessage)
-        private val tvSentMessage: TextView = itemView.findViewById(R.id.tvSentMessage)
-
-        private val tvReceivedTime: TextView = itemView.findViewById(R.id.tvReceivedTime)
-        private val tvSentTime: TextView = itemView.findViewById(R.id.tvSentTime)
+        private val messageText: TextView = itemView.findViewById(R.id.tvSimpleMessage)
+        private val messageTime: TextView = itemView.findViewById(R.id.tvSimpleTime)
+        private val messageContainer: View = itemView.findViewById(R.id.simpleMessageContainer)
 
         fun bind(message: Message) {
-            // Esconder todos os containers primeiro
-            receivedMessageContainer.visibility = View.GONE
-            sentMessageContainer.visibility = View.GONE
+            // Torna o container visível
+            messageContainer.visibility = View.VISIBLE
 
+            // Esconde outros containers
+            itemView.findViewById<View>(R.id.receivedMessageContainer).visibility = View.GONE
+            itemView.findViewById<View>(R.id.sentMessageContainer).visibility = View.GONE
+
+            messageText.text = message.text
+            messageTime.text = formatTime(message.timestamp)
+
+            // Define o alinhamento baseado em quem enviou a mensagem
+            val layoutParams = messageContainer.layoutParams as ViewGroup.MarginLayoutParams
             if (message.isSentByMe) {
-                // Mensagem enviada por mim
-                sentMessageContainer.visibility = View.VISIBLE
-                tvSentMessage.text = message.text
-                tvSentTime.text = formatTime(message.timestamp)
+                // Mensagem enviada por mim - alinha à direita
+                layoutParams.setMargins(100, 4, 16, 4)
+                messageContainer.setBackgroundResource(R.drawable.message_sent_background)
+                messageText.setTextColor(itemView.context.getColor(android.R.color.white))
+                messageTime.setTextColor(itemView.context.getColor(android.R.color.white))
             } else {
-                // Mensagem recebida
-                receivedMessageContainer.visibility = View.VISIBLE
-                tvReceivedMessage.text = message.text
-                tvReceivedTime.text = formatTime(message.timestamp)
+                // Mensagem recebida - alinha à esquerda
+                layoutParams.setMargins(16, 4, 100, 4)
+                messageContainer.setBackgroundResource(R.drawable.message_received_background)
+                messageText.setTextColor(itemView.context.getColor(android.R.color.black))
+                messageTime.setTextColor(itemView.context.getColor(R.color.gray))
             }
         }
 
@@ -60,9 +61,13 @@ class SimpleMessagesAdapter(private var messages: List<Message>) :
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        val message = messages[position]
-        holder.bind(message)
+        holder.bind(messages[position])
     }
 
     override fun getItemCount(): Int = messages.size
+
+    fun updateMessages(newMessages: List<Message>) {
+        messages = newMessages
+        notifyDataSetChanged()
+    }
 }
