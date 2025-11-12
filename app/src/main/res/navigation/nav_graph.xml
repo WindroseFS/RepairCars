@@ -33,13 +33,11 @@
             android:id="@+id/action_registerFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
 
-        <!-- AÇÃO ADICIONADA: Register para Chats -->
         <action
             android:id="@+id/action_registerFragment_to_nav_chats"
             app:destination="@id/nav_chats"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true" />
-
     </fragment>
 
     <!-- Fragment de Conversas -->
@@ -56,7 +54,6 @@
         <action
             android:id="@+id/action_chatsFragment_to_contactsFragment"
             app:destination="@id/nav_contacts" />
-
     </fragment>
 
     <!-- Fragment de Chat -->
@@ -66,7 +63,6 @@
         android:label="Chat"
         tools:layout="@layout/fragment_chat">
 
-        <!-- CORRIGIDO: contactId mudado de long para string -->
         <argument
             android:name="contactId"
             app:argType="string" />
@@ -79,8 +75,7 @@
             android:id="@+id/action_chatFragment_to_chatsFragment"
             app:destination="@id/nav_chats"
             app:popUpTo="@id/nav_chats"
-            app:popUpToInclusive="true" />
-
+            app:popUpToInclusive="false" />
     </fragment>
 
     <!-- Fragment de Novo Chat/Contato -->
@@ -93,8 +88,8 @@
         <action
             android:id="@+id/action_newChatFragment_to_contactsFragment"
             app:destination="@id/nav_contacts"
-            app:popUpTo="@id/nav_contacts" />
-
+            app:popUpTo="@id/nav_contacts"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <!-- Fragment de Contatos -->
@@ -104,16 +99,17 @@
         android:label="Contatos"
         tools:layout="@layout/fragment_contacts">
 
+        <!-- ✅ Corrigido: argumento opcional e seguro -->
         <argument
             android:name="newContact"
             app:argType="com.thorapps.repaircars.contacts.Contact"
-            app:nullable="true" />
+            app:nullable="true"
+            android:defaultValue="@null" />
 
         <action
             android:id="@+id/action_contactsFragment_to_newChatFragment"
             app:destination="@id/nav_new_chat" />
 
-        <!-- AÇÃO CORRIGIDA: Agora passa contactId como string -->
         <action
             android:id="@+id/action_contactsFragment_to_chatFragment"
             app:destination="@id/nav_chat">
@@ -130,8 +126,8 @@
         <action
             android:id="@+id/action_contactsFragment_to_chatsFragment"
             app:destination="@id/nav_chats"
-            app:popUpTo="@id/nav_chats" />
-
+            app:popUpTo="@id/nav_chats"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <!-- Fragment de Notícias -->

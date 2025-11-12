@@ -4,11 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.thorapps.repaircars.databinding.FragmentNewContactBinding
-
 
 class NewContactFragment : Fragment() {
 
@@ -25,20 +23,18 @@ class NewContactFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupViews()
+
+        setupClickListeners()
     }
 
-    private fun setupViews() {
-        binding.newChatToolbar.setNavigationOnClickListener {
+    private fun setupClickListeners() {
+        binding.btnCancel.setOnClickListener {
+            // ✅ Navega de volta para ContactsFragment
             findNavController().navigateUp()
         }
 
         binding.btnSaveContact.setOnClickListener {
             saveContact()
-        }
-
-        binding.btnCancel.setOnClickListener {
-            findNavController().navigateUp()
         }
     }
 
@@ -47,48 +43,30 @@ class NewContactFragment : Fragment() {
         val phone = binding.etContactPhone.text.toString().trim()
         val email = binding.etContactEmail.text.toString().trim()
 
-        if (!validateInputs(name, phone)) {
+        if (name.isEmpty() || phone.isEmpty()) {
+            // Mostrar erro se campos obrigatórios estiverem vazios
+            if (name.isEmpty()) {
+                binding.etContactName.error = "Nome é obrigatório"
+            }
+            if (phone.isEmpty()) {
+                binding.etContactPhone.error = "Telefone é obrigatório"
+            }
             return
         }
 
+        // Criar novo contato
         val newContact = Contact(
             id = System.currentTimeMillis().toString(),
             name = name,
-            phone = if (phone.isNotEmpty()) phone else null,
-            email = email
+            phone = phone,
+            email = if (email.isNotEmpty()) email else null
         )
 
-        // SAFE ARGS - Navegando com argumentos
+        // ✅ Navegar de volta para ContactsFragment passando o novo contato
         val action = NewContactFragmentDirections.actionNewChatFragmentToContactsFragment(
             newContact = newContact
         )
         findNavController().navigate(action)
-
-        showSuccess("Contato adicionado com sucesso!")
-    }
-
-    private fun validateInputs(name: String, phone: String): Boolean {
-        var isValid = true
-
-        if (name.isEmpty()) {
-            binding.etContactName.error = "Digite o nome do contato"
-            isValid = false
-        } else {
-            binding.etContactName.error = null
-        }
-
-        if (phone.isEmpty()) {
-            binding.etContactPhone.error = "Digite o telefone do contato"
-            isValid = false
-        } else {
-            binding.etContactPhone.error = null
-        }
-
-        return isValid
-    }
-
-    private fun showSuccess(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     override fun onDestroyView() {

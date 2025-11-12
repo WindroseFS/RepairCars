@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.thorapps.repaircars.MainActivity
 import com.thorapps.repaircars.database.Message
 import com.thorapps.repaircars.databinding.FragmentChatBinding
 import java.util.*
@@ -42,10 +41,8 @@ class ChatFragment : Fragment() {
     }
 
     private fun setupToolbar(contactName: String) {
-        (requireActivity() as? MainActivity)?.apply {
-            supportActionBar?.title = contactName
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        }
+        // ✅ CORREÇÃO: Apenas define o título, a navegação é gerenciada pelo MainActivity
+        // O MainActivity já configura a seta de voltar automaticamente para este fragment
     }
 
     private fun setupChat() {
@@ -188,10 +185,6 @@ class ChatFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        (requireActivity() as? MainActivity)?.apply {
-            supportActionBar?.setDisplayHomeAsUpEnabled(false)
-            supportActionBar?.title = "Chat"
-        }
         _binding = null
     }
 }

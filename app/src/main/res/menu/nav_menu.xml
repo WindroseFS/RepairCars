@@ -1,17 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Grupo principal de itens -->
     <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_chats"
+            android:icon="@drawable/ic_chat"
+            android:title="Conversas" />
+
         <item
             android:id="@+id/nav_contacts"
-            android:icon="@android:drawable/ic_menu_my_calendar"
+            android:icon="@drawable/ic_contacts"
             android:title="Contatos" />
+
         <item
-            android:id="@+id/nav_services"
-            android:icon="@android:drawable/ic_menu_manage"
-            android:title="Serviços" />
+            android:id="@+id/nav_notifications"
+            android:icon="@drawable/ic_notifications"
+            android:title="Notificações" />
+
         <item
-            android:id="@+id/nav_customers"
-            android:icon="@android:drawable/ic_menu_myplaces"
-            android:title="Clientes" />
+            android:id="@+id/nav_news"
+            android:icon="@drawable/ic_news"
+            android:title="Notícias" />
+
     </group>
+
+    <!-- Divisor -->
+    <item android:title="Configurações">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_settings"
+                android:title="Configurações" />
+
+            <item
+                android:id="@+id/nav_help"
+                android:icon="@drawable/ic_help"
+                android:title="Ajuda" />
+        </menu>
+    </item>
+
+    <!-- Logout (separado) -->
+    <group android:id="@+id/group_logout">
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_logout"
+            android:title="Sair" />
+    </group>
+
 </menu>
