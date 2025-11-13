@@ -29,29 +29,24 @@ class ContactAdapter(
         val contact = contacts[position]
 
         holder.binding.apply {
-            // Layout padrão de contato
             contactLayout.visibility = View.VISIBLE
             chatContactLayout.visibility = View.GONE
             databaseInfoLayout.visibility = View.GONE
 
             tvContactName.text = contact.name
-
-            // Mostra telefone ou email
             tvContactPhone.text = when {
                 !contact.phone.isNullOrBlank() -> contact.phone
                 !contact.email.isNullOrBlank() -> contact.email
                 else -> "Sem contato"
             }
 
-            // Exibe última mensagem se houver
-            if (contact.lastMessage.isNotBlank()) {
+            if (!contact.lastMessage.isNullOrBlank()) {
                 tvLastMessage.visibility = View.VISIBLE
                 tvLastMessage.text = contact.lastMessage
             } else {
                 tvLastMessage.visibility = View.GONE
             }
 
-            // Clica no item → executa ação
             contactItem.setOnClickListener { onClick(contact) }
         }
     }

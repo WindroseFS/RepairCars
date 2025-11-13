@@ -29,4 +29,7 @@
     <!-- Strings para as novas activities -->
     <string name="title_news">Notícias</string>
     <string name="title_chats">Conversas</string>
+
+    <!-- ✅ Corrige o erro de recurso ausente -->
+    <string name="descricao_foto_contato">Foto do contato</string>
 </resources>

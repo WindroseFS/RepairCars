@@ -20,7 +20,6 @@ class DatabaseInfoAdapter(private var data: List<DatabaseInfoItem>) :
         private val binding = ItemContactBinding.bind(itemView)
 
         fun bind(item: DatabaseInfoItem) {
-            // Mostrar layout de database info e esconder outros
             binding.contactLayout.visibility = View.GONE
             binding.chatContactLayout.visibility = View.GONE
             binding.databaseInfoLayout.visibility = View.VISIBLE

@@ -18,11 +18,9 @@ class DatabaseHelper(context: Context) :
     companion object {
         private const val DATABASE_NAME = "repaircars.db"
         private const val DATABASE_VERSION = 8
-
         const val TABLE_CONTACTS = "contacts"
         const val TABLE_MESSAGES = "messages"
         const val TABLE_MESSAGE_OPTIONS = "message_options"
-
         private const val TAG = "DatabaseHelper"
     }
 
@@ -82,12 +80,9 @@ class DatabaseHelper(context: Context) :
         }
     }
 
-    // 🔹 Gera ID único
-    fun generateContactId(): String {
-        return "contact_${System.currentTimeMillis()}_${(1000..9999).random()}"
-    }
+    fun generateContactId(): String =
+        "contact_${System.currentTimeMillis()}_${(1000..9999).random()}"
 
-    // 🔹 Adiciona contato (telefone opcional, e-mail obrigatório)
     suspend fun addContact(id: String, name: String, phone: String?, email: String): Long =
         withContext(Dispatchers.IO) {
             try {
@@ -104,7 +99,6 @@ class DatabaseHelper(context: Context) :
             }
         }
 
-    // 🔹 Obtém todos os contatos
     suspend fun getAllContacts(): List<Contact> = withContext(Dispatchers.IO) {
         val contacts = mutableListOf<Contact>()
         try {
@@ -121,8 +115,7 @@ class DatabaseHelper(context: Context) :
                     val id = cursor.getString(idxId)
                     val name = cursor.getString(idxName)
                     val phone = if (!cursor.isNull(idxPhone)) cursor.getString(idxPhone) else null
-                    val email = cursor.getString(idxEmail) // obrigatório
-
+                    val email = cursor.getString(idxEmail)
                     contacts.add(Contact(id, name, phone, email))
                 }
             }
@@ -132,7 +125,6 @@ class DatabaseHelper(context: Context) :
         contacts
     }
 
-    // 🔹 Retorna contatos com última mensagem e e-mail
     suspend fun getContactsWithLastMessage(): List<ContactDisplay> =
         withContext(Dispatchers.IO) {
             val list = mutableListOf<ContactDisplay>()
@@ -160,19 +152,11 @@ class DatabaseHelper(context: Context) :
                     while (cursor.moveToNext()) {
                         val id = cursor.getString(idxId)
                         val name = cursor.getString(idxName)
-
-                        val phone = if (!cursor.isNull(idxPhone)) {
-                            cursor.getString(idxPhone)
-                        } else {
-                            null
-                        }
-
-                        val email = cursor.getString(idxEmail)
-                        val lastMessage = if (!cursor.isNull(idxLastMessage)) {
-                            cursor.getString(idxLastMessage)
-                        } else {
-                            "Sem mensagens"
-                        }
+                        val phone = if (!cursor.isNull(idxPhone)) cursor.getString(idxPhone) else null
+                        val email = if (!cursor.isNull(idxEmail)) cursor.getString(idxEmail) else null
+                        val lastMessage =
+                            if (!cursor.isNull(idxLastMessage)) cursor.getString(idxLastMessage)
+                            else "Sem mensagens"
 
                         val contact = Contact(id, name, phone, email, lastMessage)
                         list.add(ContactDisplay(contact, lastMessage, phone, email))
@@ -184,58 +168,12 @@ class DatabaseHelper(context: Context) :
             list
         }
 
-    // 🔹 Obtém mensagens de um contato
-    suspend fun getMessagesForContact(contactId: String): List<Message> =
-        withContext(Dispatchers.IO) {
-            val messages = mutableListOf<Message>()
-            try {
-                readableDatabase.rawQuery(
-                    """
-                    SELECT id, contactId, text, isSentByMe, timestamp, latitude, longitude 
-                    FROM $TABLE_MESSAGES 
-                    WHERE contactId = ? 
-                    ORDER BY timestamp ASC
-                    """,
-                    arrayOf(contactId)
-                ).use { cursor ->
-                    val idxId = cursor.getColumnIndexOrThrow("id")
-                    val idxContactId = cursor.getColumnIndexOrThrow("contactId")
-                    val idxText = cursor.getColumnIndexOrThrow("text")
-                    val idxIsSentByMe = cursor.getColumnIndexOrThrow("isSentByMe")
-                    val idxTimestamp = cursor.getColumnIndexOrThrow("timestamp")
-                    val idxLatitude = cursor.getColumnIndexOrThrow("latitude")
-                    val idxLongitude = cursor.getColumnIndexOrThrow("longitude")
-
-                    while (cursor.moveToNext()) {
-                        val latitude = if (!cursor.isNull(idxLatitude)) cursor.getDouble(idxLatitude) else null
-                        val longitude = if (!cursor.isNull(idxLongitude)) cursor.getDouble(idxLongitude) else null
-
-                        messages.add(
-                            Message(
-                                id = cursor.getLong(idxId),
-                                contactId = cursor.getString(idxContactId),
-                                text = cursor.getString(idxText),
-                                isSentByMe = cursor.getInt(idxIsSentByMe) == 1,
-                                timestamp = cursor.getLong(idxTimestamp),
-                                latitude = latitude,
-                                longitude = longitude
-                            )
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Erro ao obter mensagens: ${e.message}")
-            }
-            messages
-        }
-
-    // 🔹 Adiciona mensagem
     suspend fun addMessage(
         contactId: String,
         text: String,
         isSentByMe: Boolean,
-        lat: Double? = null,
-        lng: Double? = null
+        latitude: Double? = null,
+        longitude: Double? = null
     ): Long = withContext(Dispatchers.IO) {
         try {
             val values = ContentValues().apply {
@@ -243,8 +181,8 @@ class DatabaseHelper(context: Context) :
                 put("text", text)
                 put("isSentByMe", if (isSentByMe) 1 else 0)
                 put("timestamp", System.currentTimeMillis())
-                if (lat != null) put("latitude", lat)
-                if (lng != null) put("longitude", lng)
+                if (latitude != null) put("latitude", latitude)
+                if (longitude != null) put("longitude", longitude)
             }
             writableDatabase.insert(TABLE_MESSAGES, null, values)
         } catch (e: Exception) {
@@ -253,7 +191,56 @@ class DatabaseHelper(context: Context) :
         }
     }
 
-    // 🔹 Inicializa dados de exemplo
+    suspend fun getMessagesForContact(contactId: String): List<Message> = withContext(Dispatchers.IO) {
+        val messages = mutableListOf<Message>()
+        try {
+            readableDatabase.rawQuery(
+                """
+                SELECT id, contactId, text, isSentByMe, timestamp, latitude, longitude, has_options 
+                FROM $TABLE_MESSAGES 
+                WHERE contactId = ? 
+                ORDER BY timestamp ASC
+                """.trimIndent(),
+                arrayOf(contactId)
+            ).use { cursor ->
+                val idxId = cursor.getColumnIndexOrThrow("id")
+                val idxContactId = cursor.getColumnIndexOrThrow("contactId")
+                val idxText = cursor.getColumnIndexOrThrow("text")
+                val idxIsSentByMe = cursor.getColumnIndexOrThrow("isSentByMe")
+                val idxTimestamp = cursor.getColumnIndexOrThrow("timestamp")
+                val idxLatitude = cursor.getColumnIndexOrThrow("latitude")
+                val idxLongitude = cursor.getColumnIndexOrThrow("longitude")
+                val idxHasOptions = cursor.getColumnIndexOrThrow("has_options")
+
+                while (cursor.moveToNext()) {
+                    val id = cursor.getLong(idxId)
+                    val contactId = cursor.getString(idxContactId)
+                    val text = cursor.getString(idxText)
+                    val isSentByMe = cursor.getInt(idxIsSentByMe) == 1
+                    val timestamp = cursor.getLong(idxTimestamp)
+                    val latitude = if (!cursor.isNull(idxLatitude)) cursor.getDouble(idxLatitude) else null
+                    val longitude = if (!cursor.isNull(idxLongitude)) cursor.getDouble(idxLongitude) else null
+                    val hasOptions = cursor.getInt(idxHasOptions) == 1
+
+                    messages.add(
+                        Message(
+                            id = id,
+                            contactId = contactId,
+                            text = text,
+                            isSentByMe = isSentByMe,
+                            timestamp = timestamp,
+                            latitude = latitude,
+                            longitude = longitude
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao obter mensagens: ${e.message}")
+        }
+        messages
+    }
+
     suspend fun initializeSampleData() = withContext(Dispatchers.IO) {
         try {
             val existing = getAllContacts()
@@ -266,7 +253,7 @@ class DatabaseHelper(context: Context) :
                     ContactData("5", "Gerente Carlos", "(21) 95555-5555", "carlos@repaircars.com")
                 )
                 samples.forEach {
-                    addContact(it.id, it.name, it.phone, it.email)
+                    addContact(it.id, it.name, it.phone, it.email ?: "")
                 }
                 Log.d(TAG, "Contatos de exemplo adicionados com sucesso.")
             }

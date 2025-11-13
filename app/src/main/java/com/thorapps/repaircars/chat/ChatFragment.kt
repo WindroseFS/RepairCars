@@ -50,7 +50,6 @@ class ChatFragment : Fragment() {
     }
 
     private fun setupToolbar(contactName: String) {
-        // Define o título da toolbar da Activity
         activity?.title = contactName
     }
 
@@ -85,7 +84,6 @@ class ChatFragment : Fragment() {
                     messagesAdapter.updateMessages(messagesList)
                     scrollToBottom()
 
-                    // Se não há mensagens, mostra estado vazio
                     if (messages.isEmpty()) {
                         showEmptyState()
                     } else {
@@ -102,25 +100,20 @@ class ChatFragment : Fragment() {
     }
 
     private fun showEmptyState() {
-        // Você pode adicionar uma view de estado vazio aqui
         binding.messagesRecyclerView.visibility = View.GONE
-        // binding.emptyStateView.visibility = View.VISIBLE
     }
 
     private fun hideEmptyState() {
         binding.messagesRecyclerView.visibility = View.VISIBLE
-        // binding.emptyStateView.visibility = View.GONE
     }
 
     private fun sendMessage() {
         val messageText = binding.etMessage.text.toString().trim()
         if (messageText.isNotEmpty()) {
             val newMessage = Message(
-                id = System.currentTimeMillis(),
                 contactId = args.contactId,
                 text = messageText,
-                isSentByMe = true,
-                timestamp = System.currentTimeMillis()
+                isSentByMe = true
             )
 
             messagesList.add(newMessage)
@@ -129,7 +122,6 @@ class ChatFragment : Fragment() {
             binding.etMessage.text?.clear()
             scrollToBottom()
 
-            // Salva no banco
             CoroutineScope(Dispatchers.IO).launch {
                 databaseHelper.addMessage(
                     args.contactId,
@@ -154,18 +146,15 @@ class ChatFragment : Fragment() {
             val randomResponse = responses.random()
 
             val responseMessage = Message(
-                id = System.currentTimeMillis() + 1,
                 contactId = args.contactId,
                 text = randomResponse,
-                isSentByMe = false,
-                timestamp = System.currentTimeMillis()
+                isSentByMe = false
             )
 
             messagesList.add(responseMessage)
             messagesAdapter.updateMessages(messagesList)
             scrollToBottom()
 
-            // Salva resposta no banco
             CoroutineScope(Dispatchers.IO).launch {
                 databaseHelper.addMessage(
                     args.contactId,
@@ -178,11 +167,9 @@ class ChatFragment : Fragment() {
 
     private fun shareLocation() {
         val locationMessage = Message(
-            id = System.currentTimeMillis(),
             contactId = args.contactId,
             text = "📍 Localização compartilhada - Oficina Central",
             isSentByMe = true,
-            timestamp = System.currentTimeMillis(),
             latitude = -23.5505,
             longitude = -46.6333
         )
@@ -191,7 +178,6 @@ class ChatFragment : Fragment() {
         messagesAdapter.updateMessages(messagesList)
         scrollToBottom()
 
-        // Salva no banco
         CoroutineScope(Dispatchers.IO).launch {
             databaseHelper.addMessage(
                 args.contactId,

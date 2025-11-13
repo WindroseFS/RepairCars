@@ -38,7 +38,6 @@ class ChatsFragment : Fragment() {
         setupRecyclerView()
         setupClickListeners()
 
-        // Inicializa dados de exemplo se necessário
         CoroutineScope(Dispatchers.IO).launch {
             databaseHelper.initializeSampleData()
             loadChats()
@@ -47,7 +46,7 @@ class ChatsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         chatsAdapter = ChatsAdapter { contactId, contactName ->
-            navigateToChat(contactId, contactName)
+            navigateToChat(contactId ?: "", contactName ?: "Contato desconhecido")
         }
 
         binding.recyclerViewChats.apply {
@@ -71,17 +70,15 @@ class ChatsFragment : Fragment() {
                 Log.d("ChatsFragment", "Encontrados ${contactsWithMessages.size} contatos com mensagens")
 
                 if (contactsWithMessages.isEmpty()) {
-                    // Se não há chats, mostra estado vazio
                     CoroutineScope(Dispatchers.Main).launch {
                         showEmptyState()
                     }
                 } else {
-                    // Converte ContactDisplay para Chat
                     val chats = contactsWithMessages.map { contactDisplay ->
                         Chat(
-                            contactId = contactDisplay.contact.id,
-                            contactName = contactDisplay.contact.name,
-                            lastMessage = contactDisplay.lastMessage,
+                            contactId = contactDisplay.contact.id ?: "",
+                            contactName = contactDisplay.contact.name ?: "Contato desconhecido",
+                            lastMessage = contactDisplay.lastMessage ?: "Sem mensagens",
                             timestamp = System.currentTimeMillis(),
                             unreadCount = 0
                         )
@@ -102,14 +99,12 @@ class ChatsFragment : Fragment() {
     }
 
     private fun showEmptyState() {
-        // Você pode adicionar uma view de estado vazio aqui
         binding.recyclerViewChats.visibility = View.GONE
-        // binding.emptyStateView.visibility = View.VISIBLE
+        // Exibir estado vazio aqui, se quiser
     }
 
     private fun hideEmptyState() {
         binding.recyclerViewChats.visibility = View.VISIBLE
-        // binding.emptyStateView.visibility = View.GONE
     }
 
     private fun navigateToChat(contactId: String, contactName: String) {
@@ -128,7 +123,6 @@ class ChatsFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Recarrega os chats quando o fragment é retomado
         loadChats()
     }
 
