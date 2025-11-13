@@ -1,4 +1,4 @@
-package com.thorapps.repaircars.database
+package com.thorapps.repaircars.database.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
@@ -12,7 +12,7 @@ data class Message(
     val timestamp: Long,
     val latitude: Double? = null,
     val longitude: Double? = null
-): Parcelable {
+) : Parcelable {
     constructor(
         contactId: String,
         text: String,

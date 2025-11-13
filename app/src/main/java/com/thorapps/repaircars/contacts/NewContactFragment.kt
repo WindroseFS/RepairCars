@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.thorapps.repaircars.database.DatabaseHelper
@@ -28,7 +29,6 @@ class NewContactFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         databaseHelper = DatabaseHelper(requireContext())
         setupClickListeners()
     }
@@ -48,27 +48,43 @@ class NewContactFragment : Fragment() {
         val phone = binding.etContactPhone.text.toString().trim()
         val email = binding.etContactEmail.text.toString().trim()
 
-        if (name.isEmpty() || phone.isEmpty()) {
-            if (name.isEmpty()) {
-                binding.etContactName.error = "Nome é obrigatório"
-            }
-            if (phone.isEmpty()) {
-                binding.etContactPhone.error = "Telefone é obrigatório"
-            }
-            return
+        var hasError = false
+
+        // ✅ Nome obrigatório
+        if (name.isEmpty()) {
+            binding.etContactName.error = "Nome é obrigatório"
+            hasError = true
         }
 
-        // Gera ID único para o contato
+        // ✅ E-mail obrigatório
+        if (email.isEmpty()) {
+            binding.etContactEmail.error = "E-mail é obrigatório"
+            hasError = true
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.etContactEmail.error = "Formato de e-mail inválido"
+            hasError = true
+        }
+
+        // ❌ Telefone opcional — sem erro se estiver vazio
+
+        if (hasError) return
+
         val contactId = databaseHelper.generateContactId()
 
-        // Salva no banco de dados
         CoroutineScope(Dispatchers.IO).launch {
-            val result = databaseHelper.addContact(contactId, name, phone, email)
+            val result = databaseHelper.addContact(
+                id = contactId,
+                name = name,
+                phone = if (phone.isEmpty()) null else phone,
+                email = email
+            )
 
             CoroutineScope(Dispatchers.Main).launch {
                 if (result != -1L) {
-                    // Navega de volta para ContactsFragment
+                    Toast.makeText(requireContext(), "Contato salvo com sucesso!", Toast.LENGTH_SHORT).show()
                     findNavController().navigateUp()
+                } else {
+                    Toast.makeText(requireContext(), "Erro ao salvar contato", Toast.LENGTH_SHORT).show()
                 }
             }
         }

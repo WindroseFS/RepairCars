@@ -5,83 +5,93 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    tools:context=".contacts.NewContactFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- ✅ REMOVIDA A TOOLBAR DUPLICADA -->
-        <!-- A toolbar é gerenciada pelo MainActivity -->
-
+        <!-- Título -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Adicionar Novo Contato"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:gravity="center"
+            android:textColor="@color/black"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="32dp" />
 
+        <!-- Nome (obrigatório) -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="true"
+            app:boxCornerRadiusTopStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusTopStart="8dp">
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etContactName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nome do contato"
+                android:hint="Nome do contato *"
                 android:inputType="textPersonName"
                 android:maxLines="1" />
-
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Telefone (opcional) -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="true"
+            app:boxCornerRadiusTopStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusTopStart="8dp">
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etContactPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Telefone"
+                android:hint="Telefone (opcional)"
                 android:inputType="phone"
                 android:maxLines="1" />
-
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- E-mail (obrigatório) -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
-            app:boxCornerRadiusBottomEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
+            app:boxBackgroundMode="outline"
+            app:hintEnabled="true"
+            app:boxCornerRadiusTopStart="8dp"
             app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusTopStart="8dp">
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etContactEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email (opcional)"
+                android:hint="E-mail *"
                 android:inputType="textEmailAddress"
                 android:maxLines="1" />
-
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Botões -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -108,9 +118,6 @@
                 android:backgroundTint="?attr/colorPrimary"
                 android:textColor="@android:color/white"
                 android:layout_marginStart="8dp" />
-
         </LinearLayout>
-
     </LinearLayout>
-
 </ScrollView>

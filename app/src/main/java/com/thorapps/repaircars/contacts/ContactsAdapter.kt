@@ -3,45 +3,66 @@ package com.thorapps.repaircars.contacts
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.thorapps.repaircars.R
+import com.thorapps.repaircars.databinding.ItemContactBinding
+import com.thorapps.repaircars.database.models.ContactDisplay
 
 class ContactsAdapter(
-    private var contacts: List<Contact>,
-    private val onItemClick: (Contact) -> Unit
+    private var contactList: List<ContactDisplay>,
+    private val onClick: (ContactDisplay) -> Unit
 ) : RecyclerView.Adapter<ContactsAdapter.ContactViewHolder>() {
 
+    inner class ContactViewHolder(val binding: ItemContactBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(contactDisplay: ContactDisplay) {
+            val contact = contactDisplay.contact
+
+            // Nome
+            binding.tvContactName.text = contact.name
+
+            // Telefone — esconde se não houver
+            if (contactDisplay.phone.isNullOrBlank()) {
+                binding.tvContactPhone.visibility = View.GONE
+            } else {
+                binding.tvContactPhone.visibility = View.VISIBLE
+                binding.tvContactPhone.text = contactDisplay.phone
+            }
+
+            // Email — sempre visível
+            binding.tvContactEmail.visibility = View.VISIBLE
+            binding.tvContactEmail.text = contactDisplay.email ?: "Sem e-mail"
+
+            // Última mensagem
+            if (!contactDisplay.lastMessage.isNullOrBlank() &&
+                contactDisplay.lastMessage != "Sem mensagens"
+            ) {
+                binding.tvLastMessage.visibility = View.VISIBLE
+                binding.tvLastMessage.text = contactDisplay.lastMessage
+            } else {
+                binding.tvLastMessage.visibility = View.GONE
+            }
+
+            // Clique
+            binding.root.setOnClickListener { onClick(contactDisplay) }
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_contact, parent, false)
-        return ContactViewHolder(view)
+        val binding =
+            ItemContactBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ContactViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
-        holder.bind(contacts[position])
+        holder.bind(contactList[position])
     }
 
-    override fun getItemCount() = contacts.size
+    override fun getItemCount(): Int = contactList.size
 
-    fun updateContacts(newContacts: List<Contact>) {
-        contacts = newContacts
+    fun updateData(newContacts: List<ContactDisplay>) {
+        contactList = newContacts
         notifyDataSetChanged()
     }
-
-    inner class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(contact: Contact) {
-            itemView.findViewById<TextView>(R.id.tvContactName).text = contact.name
-            itemView.findViewById<TextView>(R.id.tvContactPhone).text = contact.phone ?: ""
-
-            // Se existir um TextView para última mensagem
-            itemView.findViewById<TextView>(R.id.tvLastMessage)?.let { lastMessageView ->
-                lastMessageView.text = contact.lastMessage ?: ""
-            }
-
-            itemView.setOnClickListener {
-                onItemClick(contact)
-            }
-        }
-    }
 }
+

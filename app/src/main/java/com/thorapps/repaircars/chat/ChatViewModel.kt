@@ -3,7 +3,7 @@ package com.thorapps.repaircars.chat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.thorapps.repaircars.database.Message
+import com.thorapps.repaircars.database.models.Message
 
 class ChatViewModel : ViewModel() {
 

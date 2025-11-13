@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.thorapps.repaircars.database.DatabaseHelper
-import com.thorapps.repaircars.database.Message
+import com.thorapps.repaircars.database.models.Message
 import com.thorapps.repaircars.databinding.FragmentChatBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

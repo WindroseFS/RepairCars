@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.core.view.setMargins
 import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.R
-import com.thorapps.repaircars.database.Message
+import com.thorapps.repaircars.database.models.Message
 import java.text.SimpleDateFormat
 import java.util.*
 
