@@ -6,6 +6,6 @@ data class ContactDisplay(
     val contact: Contact,
     val lastMessage: String? = null
 ) {
-    val phone: String? = contact.phone
-    val email: String = contact.email ?: ""
+    val phone: String? get() = contact.phone
+    val email: String get() = contact.email ?: ""
 }

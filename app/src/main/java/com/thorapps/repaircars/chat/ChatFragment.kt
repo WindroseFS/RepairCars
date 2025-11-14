@@ -42,8 +42,6 @@ class ChatFragment : Fragment() {
         val contactId = args.contactId
         val contactName = args.contactName
 
-        Log.d("ChatFragment", "Abrindo chat com: $contactName ($contactId)")
-
         setupToolbar(contactName)
         setupChat()
         loadMessages(contactId)
@@ -56,19 +54,12 @@ class ChatFragment : Fragment() {
     private fun setupChat() {
         messagesAdapter = SimpleMessagesAdapter(messagesList)
         binding.messagesRecyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext()).apply {
-                stackFromEnd = true
-            }
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = messagesAdapter
         }
 
-        binding.btnSend.setOnClickListener {
-            sendMessage()
-        }
-
-        binding.btnLocation.setOnClickListener {
-            shareLocation()
-        }
+        binding.btnSend.setOnClickListener { sendMessage() }
+        binding.btnLocation.setOnClickListener { shareLocation() }
     }
 
     private fun loadMessages(contactId: String) {
@@ -76,62 +67,59 @@ class ChatFragment : Fragment() {
             try {
                 val messages = databaseHelper.getMessagesForContact(contactId)
 
-                Log.d("ChatFragment", "Carregadas ${messages.size} mensagens para o contato $contactId")
-
                 CoroutineScope(Dispatchers.Main).launch {
                     messagesList.clear()
                     messagesList.addAll(messages)
                     messagesAdapter.updateMessages(messagesList)
-                    scrollToBottom()
 
-                    if (messages.isEmpty()) {
-                        showEmptyState()
-                    } else {
+                    if (messages.isNotEmpty()) {
                         hideEmptyState()
+                        scrollToBottom()
+                    } else {
+                        showEmptyState()
                     }
                 }
             } catch (e: Exception) {
                 Log.e("ChatFragment", "Erro ao carregar mensagens: ${e.message}")
-                CoroutineScope(Dispatchers.Main).launch {
-                    showEmptyState()
-                }
+                CoroutineScope(Dispatchers.Main).launch { showEmptyState() }
             }
         }
     }
 
+    // EMPTY STATE FIX
     private fun showEmptyState() {
+        binding.emptyStateView.visibility = View.VISIBLE
         binding.messagesRecyclerView.visibility = View.GONE
     }
 
     private fun hideEmptyState() {
+        binding.emptyStateView.visibility = View.GONE
         binding.messagesRecyclerView.visibility = View.VISIBLE
     }
 
     private fun sendMessage() {
         val messageText = binding.etMessage.text.toString().trim()
-        if (messageText.isNotEmpty()) {
-            val newMessage = Message(
-                contactId = args.contactId,
-                text = messageText,
-                isSentByMe = true
-            )
+        if (messageText.isEmpty()) return
 
-            messagesList.add(newMessage)
-            messagesAdapter.updateMessages(messagesList)
+        val newMessage = Message(
+            contactId = args.contactId,
+            text = messageText,
+            isSentByMe = true
+        )
 
-            binding.etMessage.text?.clear()
-            scrollToBottom()
+        messagesList.add(newMessage)
+        messagesAdapter.updateMessages(messagesList)
 
-            CoroutineScope(Dispatchers.IO).launch {
-                databaseHelper.addMessage(
-                    args.contactId,
-                    messageText,
-                    true
-                )
-            }
+        binding.etMessage.text?.clear()
+        enableStackFromEnd()
+        hideEmptyState()
+        scrollToBottom()
 
-            simulateResponse()
+        CoroutineScope(Dispatchers.IO).launch {
+            databaseHelper.addMessage(args.contactId, messageText, true)
         }
+
+        simulateResponse()
     }
 
     private fun simulateResponse() {
@@ -143,6 +131,7 @@ class ChatFragment : Fragment() {
                 "Vou consultar nossa equipe técnica sobre esse problema",
                 "Podemos agendar uma avaliação para seu veículo"
             )
+
             val randomResponse = responses.random()
 
             val responseMessage = Message(
@@ -156,11 +145,7 @@ class ChatFragment : Fragment() {
             scrollToBottom()
 
             CoroutineScope(Dispatchers.IO).launch {
-                databaseHelper.addMessage(
-                    args.contactId,
-                    randomResponse,
-                    false
-                )
+                databaseHelper.addMessage(args.contactId, randomResponse, false)
             }
         }, 1500)
     }
@@ -176,16 +161,25 @@ class ChatFragment : Fragment() {
 
         messagesList.add(locationMessage)
         messagesAdapter.updateMessages(messagesList)
+
+        enableStackFromEnd()
+        hideEmptyState()
         scrollToBottom()
 
         CoroutineScope(Dispatchers.IO).launch {
             databaseHelper.addMessage(
                 args.contactId,
-                "📍 Localização compartilhada - Oficina Central",
+                locationMessage.text,
                 true,
                 -23.5505,
                 -46.6333
             )
+        }
+    }
+
+    private fun enableStackFromEnd() {
+        if (messagesList.isNotEmpty()) {
+            (binding.messagesRecyclerView.layoutManager as LinearLayoutManager).stackFromEnd = true
         }
     }
 

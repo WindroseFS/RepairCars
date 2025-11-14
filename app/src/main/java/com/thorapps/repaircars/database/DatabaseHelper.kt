@@ -159,7 +159,7 @@ class DatabaseHelper(context: Context) :
                             else "Sem mensagens"
 
                         val contact = Contact(id, name, phone, email, lastMessage)
-                        list.add(ContactDisplay(contact, lastMessage, phone, email))
+                        list.add(ContactDisplay(contact, lastMessage))
                     }
                 }
             } catch (e: Exception) {
@@ -252,10 +252,14 @@ class DatabaseHelper(context: Context) :
                     ContactData("4", "Atendimento", "(21) 96666-4444", "atendimento@repaircars.com"),
                     ContactData("5", "Gerente Carlos", "(21) 95555-5555", "carlos@repaircars.com")
                 )
-                samples.forEach {
-                    addContact(it.id, it.name, it.phone, it.email ?: "")
+                samples.forEach { contactData ->
+                    val email = contactData.email ?: ""
+                    addContact(contactData.id, contactData.name, contactData.phone, email)
                 }
                 Log.d(TAG, "Contatos de exemplo adicionados com sucesso.")
+            } else {
+                // Contatos já existem, não faz nada
+                Log.d(TAG, "Contatos já existem no banco de dados.")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Erro ao inicializar contatos: ${e.message}")
