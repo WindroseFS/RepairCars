@@ -4,13 +4,15 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import com.thorapps.repaircars.databinding.FragmentContactDetailBinding
+import kotlin.math.absoluteValue
 
 class ContactDetailFragment : DialogFragment() {
 
@@ -23,20 +25,17 @@ class ContactDetailFragment : DialogFragment() {
         private const val ARG_CONTACT = "contact"
 
         fun newInstance(contact: Contact): ContactDetailFragment {
-            val args = Bundle().apply {
-                putParcelable(ARG_CONTACT, contact)
-            }
             val fragment = ContactDetailFragment()
-            fragment.arguments = args
+            fragment.arguments = bundleOf(ARG_CONTACT to contact)
             return fragment
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, com.thorapps.repaircars.R.style.FullScreenDialog)
         arguments?.let {
-            contact = it.getParcelable(ARG_CONTACT)!!
+            // CORREÇÃO: Usando a forma não depreciada do getParcelable
+            contact = it.getParcelable<Contact>(ARG_CONTACT)!!
         }
     }
 
@@ -54,35 +53,61 @@ class ContactDetailFragment : DialogFragment() {
 
         setupViews()
         setupClickListeners()
+
+        Log.d("ContactDetail", "Contact data - Name: ${contact.name}, Email: ${contact.email}, Phone: ${contact.phone}")
     }
 
     private fun setupViews() {
-        // Configurar a imagem do contato usando o email
-        binding.contactImage.setImageBitmap(createContactImage(contact.name, contact.email))
+        // Configurar a imagem do contato
+        val contactInfo = if (contact.email.isNotBlank()) contact.email else contact.phone ?: ""
+        binding.contactImage.setImageBitmap(createContactImage(contact.name, contactInfo))
 
         binding.contactName.text = contact.name
-        binding.contactEmail.text = contact.email
+
+        // Email ou telefone (um dos dois)
+        val contactDetail = if (contact.email.isNotBlank()) {
+            contact.email
+        } else {
+            contact.phone ?: "Sem informações de contato"
+        }
+        binding.contactEmail.text = contactDetail
+
+        // Telefone (se disponível)
         binding.contactPhone.text = contact.phone ?: "Não informado"
 
-        // Botões de ação
+        // Botões de ação - mostrar apenas se a informação estiver disponível
+        binding.btnCall.visibility = if (contact.phone.isNullOrBlank()) View.GONE else View.VISIBLE
+        binding.btnMessage.visibility = if (contact.phone.isNullOrBlank()) View.GONE else View.VISIBLE
+        binding.btnEmail.visibility = if (contact.email.isBlank()) View.GONE else View.VISIBLE
+
         binding.btnCall.setOnClickListener {
-            // Implementar chamada telefônica
-            // val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${contact.phone}"))
-            // startActivity(intent)
+            contact.phone?.let { phone ->
+                if (phone.isNotBlank()) {
+                    // Implementar chamada telefônica
+                    // val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
+                    // startActivity(intent)
+                }
+            }
         }
 
         binding.btnMessage.setOnClickListener {
-            // Implementar envio de SMS
-            // val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:${contact.phone}"))
-            // startActivity(intent)
+            contact.phone?.let { phone ->
+                if (phone.isNotBlank()) {
+                    // Implementar envio de SMS
+                    // val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:$phone"))
+                    // startActivity(intent)
+                }
+            }
         }
 
         binding.btnEmail.setOnClickListener {
-            // Implementar envio de email
-            // val intent = Intent(Intent.ACTION_SENDTO).apply {
-            //     data = Uri.parse("mailto:${contact.email}")
-            // }
-            // startActivity(intent)
+            if (contact.email.isNotBlank()) {
+                // Implementar envio de email
+                // val intent = Intent(Intent.ACTION_SENDTO).apply {
+                //     data = Uri.parse("mailto:${contact.email}")
+                // }
+                // startActivity(intent)
+            }
         }
     }
 
@@ -102,22 +127,20 @@ class ContactDetailFragment : DialogFragment() {
         }
     }
 
-    private fun createContactImage(name: String, email: String): Bitmap {
-        // Criar uma imagem baseada no email (ou nome, se preferir)
-        val displayName = name.takeIf { it.isNotBlank() } ?: email.substringBefore("@")
+    private fun createContactImage(name: String, contactInfo: String): Bitmap {
+        val displayName = name.takeIf { it.isNotBlank() } ?: contactInfo.substringBefore("@")
         val initial = displayName.first().uppercase()
 
-        val size = 200 // tamanho da imagem
+        val size = 200
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
-        // Fundo colorido baseado no email (para consistência)
+        // Fundo colorido baseado no contato
         val paint = Paint().apply {
-            color = generateColorFromEmail(email)
+            color = generateColorFromContact(contactInfo)
             isAntiAlias = true
         }
 
-        // Desenhar círculo de fundo
         canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
 
         // Texto da inicial
@@ -134,20 +157,19 @@ class ContactDetailFragment : DialogFragment() {
         return bitmap
     }
 
-    private fun generateColorFromEmail(email: String): Int {
-        // Gerar cor consistente baseada no email
+    private fun generateColorFromContact(contactInfo: String): Int {
         val colors = listOf(
-            Color.parseColor("#FF6B6B"), // Vermelho
-            Color.parseColor("#4ECDC4"), // Verde água
-            Color.parseColor("#45B7D1"), // Azul
-            Color.parseColor("#96CEB4"), // Verde
-            Color.parseColor("#FFEAA7"), // Amarelo
-            Color.parseColor("#DDA0DD"), // Ameixa
-            Color.parseColor("#98D8C8"), // Verde menta
-            Color.parseColor("#F7DC6F")  // Amarelo claro
+            Color.parseColor("#FF6B6B"),
+            Color.parseColor("#4ECDC4"),
+            Color.parseColor("#45B7D1"),
+            Color.parseColor("#96CEB4"),
+            Color.parseColor("#FFEAA7"),
+            Color.parseColor("#DDA0DD"),
+            Color.parseColor("#98D8C8"),
+            Color.parseColor("#F7DC6F")
         )
 
-        val index = email.hashCode().absoluteValue % colors.size
+        val index = contactInfo.hashCode().absoluteValue % colors.size
         return colors[index]
     }
 

@@ -1,123 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/contactItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:background="?attr/selectableItemBackground"
-    android:divider="?android:attr/dividerHorizontal"
-    android:showDividers="middle">
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="?android:attr/selectableItemBackground">
 
-    <!-- ========== Layout principal de contato ========== -->
+    <!-- Imagem do contato -->
+    <ImageView
+        android:id="@+id/contact_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="Foto do contato" />
+
+    <!-- Informações do contato -->
     <LinearLayout
-        android:id="@+id/contactLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="visible">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/ivContactPhoto"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="12dp"
-            android:background="@color/light_gray"
-            android:src="@drawable/ic_person"
-            android:contentDescription="@string/descricao_foto_contato" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvContactName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Nome do Contato"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                tools:text="João Silva" />
-
-            <TextView
-                android:id="@+id/tvContactPhone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/gray"
-                android:textSize="14sp"
-                tools:text="(21) 99999-9999" />
-
-            <TextView
-                android:id="@+id/tvContactEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/gray"
-                android:textSize="14sp"
-                tools:text="email@exemplo.com" />
-
-            <TextView
-                android:id="@+id/tvLastMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/gray"
-                android:textSize="13sp"
-                android:visibility="gone"
-                tools:text="Última mensagem do chat" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- ========== Layout alternativo: chatContactLayout ========== -->
-    <LinearLayout
-        android:id="@+id/chatContactLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone">
-
+        <!-- Nome do contato -->
         <TextView
+            android:id="@+id/contact_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Chat Layout (exemplo)"
-            android:textSize="14sp"
-            android:textColor="@color/gray" />
-    </LinearLayout>
-
-    <!-- ========== Layout alternativo: databaseInfoLayout ========== -->
-    <LinearLayout
-        android:id="@+id/databaseInfoLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        android:paddingTop="8dp">
-
-        <TextView
-            android:id="@+id/tvTableName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Tabela:"
+            android:text="Nome do Contato"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:textSize="15sp"
-            tools:text="Tabela: contacts" />
+            android:textColor="@android:color/black"
+            android:ellipsize="end"
+            android:maxLines="1" />
 
+        <!-- Email ou telefone (um dos dois) -->
         <TextView
-            android:id="@+id/tvRowCount"
+            android:id="@+id/contact_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registros:"
+            android:text="email@exemplo.com"
             android:textSize="14sp"
-            tools:text="Registros: 42" />
+            android:textColor="@android:color/darker_gray"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginTop="2dp" />
 
+        <!-- Última mensagem -->
         <TextView
-            android:id="@+id/tvColumns"
+            android:id="@+id/last_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Colunas:"
+            android:text="Última mensagem..."
             android:textSize="13sp"
-            android:textColor="@color/gray"
-            tools:text="Colunas: id, name, email" />
+            android:textColor="@android:color/darker_gray"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_marginTop="4dp" />
+
     </LinearLayout>
+
 </LinearLayout>

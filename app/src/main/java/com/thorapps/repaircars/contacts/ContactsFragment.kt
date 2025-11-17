@@ -41,14 +41,13 @@ class ContactsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        contactsAdapter = ContactAdapter(emptyList()) { contact ->
+        // CORREÇÃO: Removido o emptyList() do construtor
+        contactsAdapter = ContactAdapter { contact ->
             Log.d("ContactsFragment", "Contato selecionado: ${contact.name} (${contact.id})")
-            // Navega para o chat com este contato
-            val action = ContactsFragmentDirections.actionContactsFragmentToChatFragment(
-                contactId = contact.id,
-                contactName = contact.name
-            )
-            findNavController().navigate(action)
+
+            // Abrir detalhes do contato em um dialog
+            val detailFragment = ContactDetailFragment.newInstance(contact)
+            detailFragment.show(parentFragmentManager, "ContactDetail")
         }
 
         binding.contactsRecyclerView.apply {

@@ -8,6 +8,6 @@ data class Contact(
     val id: String,
     val name: String,
     val phone: String?,
-    val email: String, // Tornado obrigatório (removido ?)
+    val email: String,
     val lastMessage: String = ""
 ) : Parcelable

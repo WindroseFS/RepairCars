@@ -20,6 +20,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
         vectorDrawables.useSupportLibrary = true
+
+        // ✅ ADICIONADO: BuildConfig fields para API
+        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:3000/api/\"")
     }
 
     buildTypes {
@@ -51,7 +54,6 @@ android {
         buildConfig = true
     }
 
-    // ✅ ADICIONADO: Configuração para Android 11+
     packaging {
         resources {
             excludes += setOf(
@@ -79,9 +81,9 @@ dependencies {
     implementation(libs.androidx.legacy.support)
     implementation(libs.androidx.multidex)
 
-    // Navigation - ✅ VERSÃO CORRIGIDA
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+    // Navigation
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     // Activity & Fragment
     implementation(libs.androidx.activity)
@@ -108,9 +110,18 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
 
-    // ✅ ADICIONADO: Dependências para Android 11+
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    // ✅ NOVAS: Networking
+    implementation(libs.retrofit2.retrofit)
+    implementation(libs.retrofit2.converter.gson)
+    implementation(libs.okhttp3.logging.interceptor)
+
+    // ✅ NOVAS: Imagens e JSON
+    implementation(libs.glide)
+    implementation(libs.gson)
+
+    // ✅ NOVAS: Android 11+
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.security.crypto)
 
     // Testes
     testImplementation(libs.junit)

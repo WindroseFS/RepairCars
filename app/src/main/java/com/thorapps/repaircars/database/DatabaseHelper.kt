@@ -153,7 +153,7 @@ class DatabaseHelper(context: Context) :
                         val id = cursor.getString(idxId)
                         val name = cursor.getString(idxName)
                         val phone = if (!cursor.isNull(idxPhone)) cursor.getString(idxPhone) else null
-                        val email = if (!cursor.isNull(idxEmail)) cursor.getString(idxEmail) else null
+                        val email = cursor.getString(idxEmail) // Já não é mais nullable
                         val lastMessage =
                             if (!cursor.isNull(idxLastMessage)) cursor.getString(idxLastMessage)
                             else "Sem mensagens"
@@ -253,7 +253,8 @@ class DatabaseHelper(context: Context) :
                     ContactData("5", "Gerente Carlos", "(21) 95555-5555", "carlos@repaircars.com")
                 )
                 samples.forEach { contactData ->
-                    val email = contactData.email ?: ""
+                    // Garantir que o email nunca seja null
+                    val email = contactData.email ?: "contato@repaircars.com"
                     addContact(contactData.id, contactData.name, contactData.phone, email)
                 }
                 Log.d(TAG, "Contatos de exemplo adicionados com sucesso.")

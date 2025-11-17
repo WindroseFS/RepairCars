@@ -10,7 +10,7 @@
     android:focusable="true">
 
     <LinearLayout
-        android:id="@+id/dialog_content"
+        android:id="@+id/dialogContent"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
@@ -27,13 +27,14 @@
             android:background="@color/purple_500">
 
             <ImageButton
-                android:id="@+id/btn_close"
+                android:id="@+id/btnClose"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_alignParentEnd="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:tint="@android:color/white" />
+                android:contentDescription="Fechar"
+                app:tint="@android:color/white" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -55,15 +56,16 @@
 
             <!-- Contact Image -->
             <ImageView
-                android:id="@+id/contact_image"
+                android:id="@+id/contactImage"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_gravity="center"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:contentDescription="Foto do contato" />
 
             <!-- Contact Name -->
             <TextView
-                android:id="@+id/contact_name"
+                android:id="@+id/contactName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -84,11 +86,12 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@android:drawable/ic_dialog_email"
-                    android:tint="?attr/colorPrimary"
+                    android:contentDescription="Ícone de email"
+                    app:tint="?attr/colorPrimary"
                     android:layout_marginEnd="8dp" />
 
                 <TextView
-                    android:id="@+id/contact_email"
+                    android:id="@+id/contactEmail"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -109,11 +112,12 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@android:drawable/ic_menu_call"
-                    android:tint="?attr/colorPrimary"
+                    android:contentDescription="Ícone de telefone"
+                    app:tint="?attr/colorPrimary"
                     android:layout_marginEnd="8dp" />
 
                 <TextView
-                    android:id="@+id/contact_phone"
+                    android:id="@+id/contactPhone"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -130,7 +134,7 @@
                 android:gravity="center">
 
                 <Button
-                    android:id="@+id/btn_call"
+                    android:id="@+id/btnCall"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -140,7 +144,7 @@
                     style="@style/Widget.Material3.Button.TonalButton" />
 
                 <Button
-                    android:id="@+id/btn_message"
+                    android:id="@+id/btnMessage"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -151,7 +155,7 @@
                     style="@style/Widget.Material3.Button.TonalButton" />
 
                 <Button
-                    android:id="@+id/btn_email"
+                    android:id="@+id/btnEmail"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

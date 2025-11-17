@@ -4,10 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.thorapps.repaircars.MainActivity
 import com.thorapps.repaircars.databinding.FragmentNewsBinding
+import com.thorapps.repaircars.network.models.ApiNews
+import com.thorapps.repaircars.repository.NewsRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NewsFragment : Fragment() {
 
@@ -15,6 +22,11 @@ class NewsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var newsAdapter: NewsAdapter
+    private val newsRepository = NewsRepository()
+    private var currentCategory = "Todas"
+    private var currentPage = 1
+    private var isLoading = false
+    private var allNews = mutableListOf<ApiNews>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,115 +40,125 @@ class NewsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
+        setupSwipeRefresh()
+        setupCategorySpinner()
         loadNews()
     }
 
     private fun setupRecyclerView() {
-        // CORREÇÃO: Configurar o adapter com uma lista vazia inicialmente
         newsAdapter = NewsAdapter(emptyList()) { news ->
-            // Handle item click - você pode adicionar ação ao clicar em uma notícia
             showNewsDetail(news)
         }
 
         binding.recyclerNews.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = newsAdapter
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            refreshNews()
+        }
+    }
+
+    private fun setupCategorySpinner() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val categorias = newsRepository.getCategorias()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val adapter = ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_item,
+                    categorias
+                )
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerCategory.adapter = adapter
+
+                binding.spinnerCategory.onItemSelectedListener =
+                    object : android.widget.AdapterView.OnItemSelectedListener {
+                        override fun onItemSelected(parent: android.widget.AdapterView<*>, view: View?, position: Int, id: Long) {
+                            val novaCategoria = parent.getItemAtPosition(position).toString()
+                            if (novaCategoria != currentCategory) {
+                                currentCategory = novaCategoria
+                                currentPage = 1
+                                allNews.clear()
+                                loadNews()
+                            }
+                        }
+
+                        override fun onNothingSelected(parent: android.widget.AdapterView<*>) {}
+                    }
+            }
         }
     }
 
     private fun loadNews() {
-        // Carregar notícias (dados mock por enquanto)
-        val news = listOf(
-            News(
-                titulo = "Novo Sistema de Diagnóstico Eletrônico",
-                descricao = "A Repair Cars acaba de implementar um sistema de diagnóstico eletrônico de última geração que permite identificar problemas com precisão milimétrica. Agilize o atendimento e tenha diagnósticos mais precisos.",
-                data = "25/11/2023"
-            ),
-            News(
-                titulo = "Promoção: Revisão Completa 30% Off",
-                descricao = "Aproveite nossa promoção especial de revisão completa com 30% de desconto. Inclui troca de óleo, filtros, verificação de freios e mais. Válida até o final do mês.",
-                data = "20/11/2023"
-            ),
-            News(
-                titulo = "Workshop: Mecânica Básica para Mulheres",
-                descricao = "Participe do nosso workshop gratuito de mecânica básica voltado para mulheres. Aprenda a trocar pneus, verificar óleo, identificar problemas básicos e muito mais. Inscrições abertas!",
-                data = "15/11/2023"
-            ),
-            News(
-                titulo = "Dicas para Manutenção Preventiva",
-                descricao = "Confira nossas dicas essenciais para manter seu veículo em perfeito estado. A manutenção preventiva pode evitar grandes prejuízos no futuro.",
-                data = "10/11/2023"
-            ),
-            News(
-                titulo = "Nova Unidade Inaugurada",
-                descricao = "Temos o prazer de anunciar a inauguração de nossa nova unidade no centro da cidade. Agora com mais espaço e equipamentos modernos para melhor atendê-lo.",
-                data = "05/11/2023"
-            )
-        )
+        if (isLoading) return
 
-        setupNewsList(news)
-    }
+        isLoading = true
+        showLoading()
 
-    private fun setupNewsList(news: List<News>) {
-        if (news.isEmpty()) {
-            binding.textEmptyState.visibility = View.VISIBLE
-            binding.recyclerNews.visibility = View.GONE
-        } else {
-            binding.textEmptyState.visibility = View.GONE
-            binding.recyclerNews.visibility = View.VISIBLE
+        CoroutineScope(Dispatchers.IO).launch {
+            val categoria = if (currentCategory == "Todas") null else currentCategory
+            val response = newsRepository.getNews(categoria, currentPage)
 
-            // CORREÇÃO: Atualizar o adapter com a lista de notícias
-            newsAdapter = NewsAdapter(news) { selectedNews ->
-                showNewsDetail(selectedNews)
+            CoroutineScope(Dispatchers.Main).launch {
+                hideLoading()
+                isLoading = false
+                binding.swipeRefreshLayout.isRefreshing = false
+
+                if (response != null && response.news.isNotEmpty()) {
+                    showNewsList(response.news)
+                    updateToolbarTitle(response.total)
+                } else {
+                    showEmptyState()
+                }
             }
-            binding.recyclerNews.adapter = newsAdapter
-
-            // Atualizar título com quantidade de notícias na toolbar principal
-            (requireActivity() as? MainActivity)?.supportActionBar?.title = "Notícias (${news.size})"
         }
     }
 
-    private fun showNewsDetail(news: News) {
-        // Mostrar detalhes da notícia (pode ser um dialog ou nova tela)
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle(news.titulo)
-            .setMessage("${news.descricao}\n\nData: ${news.data}")
-            .setPositiveButton("Fechar", null)
-            .show()
+    private fun showNewsList(news: List<ApiNews>) {
+        binding.textEmpty.visibility = View.GONE
+        binding.recyclerNews.visibility = View.VISIBLE
+
+        allNews.clear()
+        allNews.addAll(news)
+        newsAdapter.updateList(allNews.toList())
+    }
+
+    private fun showNewsDetail(news: ApiNews) {
+        android.widget.Toast.makeText(requireContext(), "Abrir: ${news.titulo}", android.widget.Toast.LENGTH_SHORT).show()
     }
 
     private fun refreshNews() {
-        // Simular atualização de notícias
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-            loadNews()
-            android.widget.Toast.makeText(
-                requireContext(),
-                "Notícias atualizadas",
-                android.widget.Toast.LENGTH_SHORT
-            ).show()
-        }, 1500)
+        currentPage = 1
+        allNews.clear()
+        loadNews()
     }
 
-    private fun showFilterOptions() {
-        val categories = arrayOf("Todas", "Promoções", "Workshops", "Dicas", "Novidades")
-
-        android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Filtrar Notícias")
-            .setItems(categories) { _, which ->
-                val selectedCategory = categories[which]
-                filterNewsByCategory(selectedCategory)
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
+    private fun showLoading() {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.recyclerNews.visibility = View.GONE
+        binding.textEmpty.visibility = View.GONE
     }
 
-    private fun filterNewsByCategory(category: String) {
-        // Implementar filtro por categoria
-        android.widget.Toast.makeText(
-            requireContext(),
-            "Filtrando por: $category",
-            android.widget.Toast.LENGTH_SHORT
-        ).show()
+    private fun hideLoading() {
+        binding.progressBar.visibility = View.GONE
+    }
+
+    private fun showEmptyState() {
+        binding.textEmpty.visibility = View.VISIBLE
+        binding.recyclerNews.visibility = View.GONE
+        binding.textEmpty.text =
+            if (currentCategory == "Todas") "Nenhuma notícia encontrada"
+            else "Nenhuma notícia na categoria $currentCategory"
+    }
+
+    private fun updateToolbarTitle(total: Int) {
+        (requireActivity() as? MainActivity)?.supportActionBar?.title =
+            "Notícias (${total})"
     }
 
     override fun onDestroyView() {

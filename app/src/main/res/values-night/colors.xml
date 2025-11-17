@@ -27,6 +27,7 @@
     <color name="message_background">#1E3A5F</color>
     <color name="message_background_me">#BB86FC</color>
     <color name="message_text_me">#000000</color>
+    <color name="purple_500">#D0BCFF</color>
 
     <!-- Cores de estado -->
     <color name="error">#CF6679</color>
