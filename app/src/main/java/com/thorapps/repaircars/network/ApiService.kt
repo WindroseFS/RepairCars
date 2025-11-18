@@ -1,10 +1,6 @@
 package com.thorapps.repaircars.network
 
-import com.thorapps.repaircars.network.models.ApiContact
-import com.thorapps.repaircars.network.models.ApiNews
-import com.thorapps.repaircars.network.models.CreateContactRequest
-import com.thorapps.repaircars.network.models.CreateNewsRequest
-import com.thorapps.repaircars.network.models.NewsResponse
+import com.thorapps.repaircars.network.models.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -49,11 +45,37 @@ interface ApiService {
 
     @POST("news")
     suspend fun createNews(@Body news: CreateNewsRequest): Response<ApiNews>
-}
 
-data class SendMessageRequest(
-    val sender: String,
-    val text: String,
-    val latitude: Double? = null,
-    val longitude: Double? = null
-)
+    // ✅ CONVERSATIONS - IMPLEMENTADOS
+    @GET("conversations")
+    suspend fun getConversations(): Response<List<ApiConversation>>
+
+    @POST("conversations")
+    suspend fun createConversation(@Body conversation: CreateConversationRequest): Response<ApiConversation>
+
+    @GET("conversations/{id}")
+    suspend fun getConversationById(@Path("id") id: String): Response<ApiConversation>
+
+    @POST("conversations/{id}/messages")
+    suspend fun sendMessage(@Path("id") conversationId: String, @Body message: SendMessageRequest): Response<ApiMessage>
+
+    // ✅ PAYMENTS - IMPLEMENTADOS
+    @GET("payments")
+    suspend fun getPayments(): Response<List<ApiPayment>>
+
+    @POST("payments")
+    suspend fun createPayment(@Body payment: CreatePaymentRequest): Response<ApiPayment>
+
+    @GET("payments/{id}")
+    suspend fun getPaymentById(@Path("id") id: String): Response<ApiPayment>
+
+    // ✅ LOCATIONS - IMPLEMENTADOS
+    @GET("locations")
+    suspend fun getLocations(): Response<List<ApiLocation>>
+
+    @POST("locations")
+    suspend fun createLocation(@Body location: CreateLocationRequest): Response<ApiLocation>
+
+    @GET("locations/{id}")
+    suspend fun getLocationById(@Path("id") id: String): Response<ApiLocation>
+}

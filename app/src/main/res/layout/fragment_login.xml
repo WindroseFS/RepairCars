@@ -11,16 +11,17 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="32dp"
-            android:text="Login"
-            android:textSize="28sp"
-            android:textStyle="bold" />
+
 
         <!-- Container para telefone (inicialmente invisível) -->
+
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="200sp"
+            app:srcCompat="@drawable/repaircarssiteOficial" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/phoneContainer"
             android:layout_width="match_parent"
