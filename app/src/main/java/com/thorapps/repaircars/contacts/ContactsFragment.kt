@@ -41,11 +41,9 @@ class ContactsFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        // CORREÇÃO: Removido o emptyList() do construtor
         contactsAdapter = ContactAdapter { contact ->
             Log.d("ContactsFragment", "Contato selecionado: ${contact.name} (${contact.id})")
 
-            // Abrir detalhes do contato em um dialog
             val detailFragment = ContactDetailFragment.newInstance(contact)
             detailFragment.show(parentFragmentManager, "ContactDetail")
         }
@@ -58,7 +56,6 @@ class ContactsFragment : Fragment() {
 
     private fun setupFab() {
         binding.fabAddContact.setOnClickListener {
-            // Navega para NewContactFragment
             val action = ContactsFragmentDirections.actionContactsFragmentToNewChatFragment()
             findNavController().navigate(action)
         }
@@ -71,28 +68,36 @@ class ContactsFragment : Fragment() {
 
                 Log.d("ContactsFragment", "Carregados ${contacts.size} contatos")
 
-                if (contacts.isEmpty()) {
-                    // Inicializa dados de exemplo se não há contatos
-                    databaseHelper.initializeSampleData()
-                    // Recarrega contatos após inicialização
-                    val updatedContacts = databaseHelper.getAllContacts()
-                    CoroutineScope(Dispatchers.Main).launch {
-                        contactsAdapter.updateContacts(updatedContacts)
-                    }
-                } else {
-                    CoroutineScope(Dispatchers.Main).launch {
+                CoroutineScope(Dispatchers.Main).launch {
+                    if (contacts.isEmpty()) {
+                        showEmptyState()
+                    } else {
+                        hideEmptyState()
                         contactsAdapter.updateContacts(contacts)
                     }
                 }
             } catch (e: Exception) {
                 Log.e("ContactsFragment", "Erro ao carregar contatos: ${e.message}")
+                CoroutineScope(Dispatchers.Main).launch {
+                    showEmptyState()
+                }
             }
         }
     }
 
+    private fun showEmptyState() {
+        binding.contactsRecyclerView.visibility = View.GONE
+        binding.textEmptyState.visibility = View.VISIBLE
+        binding.textEmptyState.text = "Nenhum contato encontrado\nToque no botão + para adicionar um novo contato"
+    }
+
+    private fun hideEmptyState() {
+        binding.contactsRecyclerView.visibility = View.VISIBLE
+        binding.textEmptyState.visibility = View.GONE
+    }
+
     override fun onResume() {
         super.onResume()
-        // Recarrega contatos quando o fragment é retomado
         loadContacts()
     }
 

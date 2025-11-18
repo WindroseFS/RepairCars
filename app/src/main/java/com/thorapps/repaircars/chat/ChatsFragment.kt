@@ -37,11 +37,7 @@ class ChatsFragment : Fragment() {
 
         setupRecyclerView()
         setupClickListeners()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            databaseHelper.initializeSampleData()
-            loadChats()
-        }
+        loadChats()
     }
 
     private fun setupRecyclerView() {
@@ -76,11 +72,11 @@ class ChatsFragment : Fragment() {
                 } else {
                     val chats = contactsWithMessages.map { contactDisplay ->
                         Chat(
-                            contactId = contactDisplay.contact.id ?: "",
-                            contactName = contactDisplay.contact.name ?: "Contato desconhecido",
+                            contactId = contactDisplay.id,
+                            contactName = contactDisplay.name,
                             lastMessage = contactDisplay.lastMessage ?: "Sem mensagens",
                             timestamp = System.currentTimeMillis(),
-                            unreadCount = 0
+                            unreadCount = contactDisplay.unreadCount
                         )
                     }
 
@@ -100,11 +96,13 @@ class ChatsFragment : Fragment() {
 
     private fun showEmptyState() {
         binding.recyclerViewChats.visibility = View.GONE
-        // Exibir estado vazio aqui, se quiser
+        binding.textEmptyState.visibility = View.VISIBLE
+        binding.textEmptyState.text = "Nenhuma conversa iniciada\nToque no botão + para começar uma nova conversa"
     }
 
     private fun hideEmptyState() {
         binding.recyclerViewChats.visibility = View.VISIBLE
+        binding.textEmptyState.visibility = View.GONE
     }
 
     private fun navigateToChat(contactId: String, contactName: String) {

@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.thorapps.repaircars.contacts.Contact
-import com.thorapps.repaircars.database.models.ContactData
 import com.thorapps.repaircars.database.models.ContactDisplay
 import com.thorapps.repaircars.database.models.Message
 import kotlinx.coroutines.Dispatchers
@@ -148,18 +147,28 @@ class DatabaseHelper(context: Context) :
                     val idxPhone = cursor.getColumnIndexOrThrow("phone")
                     val idxEmail = cursor.getColumnIndexOrThrow("email")
                     val idxLastMessage = cursor.getColumnIndexOrThrow("last_message")
+                    val idxLastTimestamp = cursor.getColumnIndexOrThrow("last_timestamp")
 
                     while (cursor.moveToNext()) {
                         val id = cursor.getString(idxId)
                         val name = cursor.getString(idxName)
                         val phone = if (!cursor.isNull(idxPhone)) cursor.getString(idxPhone) else null
-                        val email = cursor.getString(idxEmail) // Já não é mais nullable
-                        val lastMessage =
-                            if (!cursor.isNull(idxLastMessage)) cursor.getString(idxLastMessage)
-                            else "Sem mensagens"
+                        val email = cursor.getString(idxEmail)
+                        val lastMessage = if (!cursor.isNull(idxLastMessage)) cursor.getString(idxLastMessage) else null
+                        val lastTimestamp = if (!cursor.isNull(idxLastTimestamp)) cursor.getLong(idxLastTimestamp) else null
 
-                        val contact = Contact(id, name, phone, email, lastMessage)
-                        list.add(ContactDisplay(contact, lastMessage))
+                        // CORREÇÃO: Criando ContactDisplay com a estrutura correta
+                        list.add(
+                            ContactDisplay(
+                                id = id,
+                                name = name,
+                                phone = phone,
+                                email = email,
+                                lastMessage = lastMessage,
+                                lastMessageTime = lastTimestamp?.toString(),
+                                unreadCount = 0
+                            )
+                        )
                     }
                 }
             } catch (e: Exception) {
@@ -241,29 +250,14 @@ class DatabaseHelper(context: Context) :
         messages
     }
 
-    suspend fun initializeSampleData() = withContext(Dispatchers.IO) {
+    suspend fun clearAllData() = withContext(Dispatchers.IO) {
         try {
-            val existing = getAllContacts()
-            if (existing.isEmpty()) {
-                val samples = listOf(
-                    ContactData("1", "Oficina Central", "(21) 99999-1111", "oficina@repaircars.com"),
-                    ContactData("2", "Suporte Técnico", "(21) 98888-2222", "suporte@repaircars.com"),
-                    ContactData("3", "Mecânico João", "(21) 97777-3333", "joao@repaircars.com"),
-                    ContactData("4", "Atendimento", "(21) 96666-4444", "atendimento@repaircars.com"),
-                    ContactData("5", "Gerente Carlos", "(21) 95555-5555", "carlos@repaircars.com")
-                )
-                samples.forEach { contactData ->
-                    // Garantir que o email nunca seja null
-                    val email = contactData.email ?: "contato@repaircars.com"
-                    addContact(contactData.id, contactData.name, contactData.phone, email)
-                }
-                Log.d(TAG, "Contatos de exemplo adicionados com sucesso.")
-            } else {
-                // Contatos já existem, não faz nada
-                Log.d(TAG, "Contatos já existem no banco de dados.")
-            }
+            writableDatabase.delete(TABLE_CONTACTS, null, null)
+            writableDatabase.delete(TABLE_MESSAGES, null, null)
+            writableDatabase.delete(TABLE_MESSAGE_OPTIONS, null, null)
+            Log.d(TAG, "Todos os dados foram removidos do banco de dados.")
         } catch (e: Exception) {
-            Log.e(TAG, "Erro ao inicializar contatos: ${e.message}")
+            Log.e(TAG, "Erro ao limpar dados: ${e.message}")
         }
     }
 }

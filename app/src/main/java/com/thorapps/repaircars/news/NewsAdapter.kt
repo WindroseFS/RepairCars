@@ -28,8 +28,8 @@ class NewsAdapter(
             binding.tvData.text = news.data
 
             // Usar safe calls para views que podem ser nulas
-            binding.tvCategoria?.text = news.categoria
-            binding.tvVisualizacoes?.text = "${news.visualizacoes} visualizações"
+            binding.tvCategoria.text = news.categoria
+            binding.tvVisualizacoes.text = "${news.visualizacoes} visualizações"
 
             // Carregar imagem se disponível
             news.imageUrl?.takeIf { it.isNotBlank() }?.let { imageUrl ->

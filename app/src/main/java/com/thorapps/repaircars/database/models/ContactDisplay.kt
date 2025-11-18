@@ -5,7 +5,7 @@ import com.thorapps.repaircars.contacts.Contact
 data class ContactDisplay(
     val id: String,
     val name: String,
-    val phone: String,
+    val phone: String?,
     val email: String?,
     val type: String = "customer",
     val lastMessage: String? = null,
@@ -26,6 +26,6 @@ data class ContactDisplay(
         }
     }
 
-    val displayPhone: String get() = phone
+    val displayPhone: String? get() = phone
     val displayEmail: String get() = email ?: ""
 }

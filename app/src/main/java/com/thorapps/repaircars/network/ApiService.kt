@@ -3,6 +3,7 @@ package com.thorapps.repaircars.network
 import com.thorapps.repaircars.network.models.ApiContact
 import com.thorapps.repaircars.network.models.ApiNews
 import com.thorapps.repaircars.network.models.CreateContactRequest
+import com.thorapps.repaircars.network.models.CreateNewsRequest
 import com.thorapps.repaircars.network.models.NewsResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -47,7 +48,7 @@ interface ApiService {
     ): Response<NewsResponse>
 
     @POST("news")
-    suspend fun createNews(@Body news: CreateContactRequest): Response<ApiNews>
+    suspend fun createNews(@Body news: CreateNewsRequest): Response<ApiNews>
 }
 
 data class SendMessageRequest(
